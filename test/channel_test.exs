@@ -1,26 +1,35 @@
 defmodule Consult.ChannelTest do
   use ChannelCase
 
-  defmodule OurChannel do
+  defmodule Consult.Hooks do
+    def endpoint do
+      TestApp.Endpoint
+    end
+  end
+
+  defmodule PanelChannel do
     use Phoenix.Channel
 
-    def join("some:topic", _opts, socket) do
+    def join("panel_updates", _opts, socket) do
       {:ok, socket}
     end
 
-    def handle_in("ping", payload, socket) do
-      {:reply, {:ok, payload}, socket}
+    def send_update do
+      Consult.Hooks.endpoint.broadcast(
+        # TODO - have this render something meaningful
+        "panel_updates", "update", %{body: "<h1>The Panel</h1>"}
+      )
     end
   end
 
   setup do
-    {:ok, _, socket} = socket() |> subscribe_and_join(OurChannel, "some:topic")
+    {:ok, _, socket} = socket() |> subscribe_and_join(PanelChannel, "panel_updates")
     {:ok, socket: socket}
   end
 
-  test "ping replies with status :ok", %{socket: socket} do
-    ref = push socket, "ping", %{"hello" => "there"}
-    assert_reply ref, :ok, %{"hello" => "there"}
+  test "sends an updated CS panel" do
+    PanelChannel.send_update
+    assert_broadcast "update", %{body: "<h1>The Panel</h1>"}
   end
 
 end
