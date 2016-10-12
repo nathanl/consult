@@ -67,11 +67,12 @@ defmodule Consult.Conversation do
       """
       (SELECT
       conversation_id,
-      -- COUNT DISTINCT ignores nulls, hence the COALESCE
-      -- this handles the case where there is at least one message,
-      -- but it has no sender_id; call it '0' so we can count
-      -- it as one unique participant
-      COUNT(DISTINCT COALESCE(sender_id, 0)) AS participant_count
+      -- Assume every participant has a distinct combination of
+      -- sender_id and sender_name and count them.
+      -- If user and rep both have no id and are both named 'Alex',
+      -- that will be a weird edge case and we'll think there's only
+      -- one participant.
+      COUNT(DISTINCT CONCAT(COALESCE(sender_id, 0), COALESCE(sender_name, 'NONE'))) AS participant_count
       FROM consult_messages
       GROUP BY conversation_id
       )

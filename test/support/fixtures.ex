@@ -1,7 +1,7 @@
 defmodule Fixtures do
   alias Consult.{Conversation,Message}
 
-  def ongoing_conversation do
+  def ongoing_conversation(options \\ %{rep_id: 1}) do
     %Conversation {
       messages: [
         %Message{
@@ -10,7 +10,7 @@ defmodule Fixtures do
           content: "Is your maple syrup vegan?"
         },
         %Message{
-          sender_id: 1,
+          sender_id: options.rep_id,
           sender_name: "Rep",
           content: "Yes, and made from free-range trees!"
         },
