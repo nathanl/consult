@@ -1,6 +1,6 @@
 # Consult
 
-**TODO: Add description**
+NOTHING TO SEE HERE (yet).
 
 ## Installation
 
