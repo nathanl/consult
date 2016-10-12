@@ -1,0 +1,21 @@
+<h1>Conversations</h1>
+
+<div id="chatterbox-dashboard">
+  <%= Enum.map(@conversations, fn ({category, conversations}) -> %>
+    <div class="conversation-category">
+      <h2><%= category %></h2>
+      <%= Enum.map(conversations, fn (conversation) -> %>
+        <div class="conversation">
+          <%= link("💬", to: "/consult/conversations/#{conversation.id}") %>
+          <span class="user-name"><%= raw(conversation.first_message.sender_name) %></span>
+          <span class="opening-message"><%= raw(conversation.first_message.content) %></span>
+          <%= Enum.map(conversation.tags, fn (tag) -> %>
+            <%= if !is_nil(tag) do %>
+              <span class="conversation-tag <%= tag.name %>"><%= tag.name %></span>
+            <% end %>
+          <% end) %>
+        </div>
+      <% end) %>
+    </div>
+  <% end) %>
+</div>

@@ -2,24 +2,33 @@ defmodule Consult.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :consult,
-     version: "0.1.0",
-     build_path: "../../_build",
-     config_path: "../../config/config.exs",
-     deps_path: "../../deps",
-     lockfile: "../../mix.lock",
-     elixir: "~> 1.3",
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps]
+    [
+      app: :consult,
+      version: "0.1.0",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      elixir: "~> 1.3",
+      elixirc_paths: elixirc_paths(Mix.env),
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      compilers: [:phoenix] ++ Mix.compilers,
+      deps: deps,
+    ]
   end
 
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
   def application do
-    [mod: {Consult, []}, applications: [:logger]]
+    [
+      mod: {Consult, []},
+      applications: [
+        :logger,
+        :phoenix,
+      ],
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -38,6 +47,8 @@ defmodule Consult.Mixfile do
   defp deps do
     [
       {:phoenix, "~> 1.2"},
+      {:phoenix_html, "~> 2.6"},
+      {:phoenix_pubsub, "~> 1.0"},
     ]
   end
 
