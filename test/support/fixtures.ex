@@ -18,4 +18,44 @@ defmodule Fixtures do
     }
   end
 
+  def unanswered_conversation do
+    %Conversation {
+      messages: [
+        %Message{
+          sender_id: nil,
+          sender_name: "Cleese",
+          content: "Hello, I would like to buy a fish license, please."
+        },
+        %Message{
+          sender_id: nil,
+          sender_name: "Cleese",
+          content: "He is an halibut."
+        },
+      ]
+    }
+  end
+
+  def ended_conversation do
+    %Conversation {
+      ended_at: Ecto.DateTime.utc,
+      messages: [
+        %Message{
+          sender_id: nil,
+          sender_name: "Alex",
+          content: "How quickly can you ship a fire extinguisher?"
+        },
+        %Message{
+          sender_id: 1,
+          sender_name: "Rep",
+          content: "Could be there by Tuesday."
+        },
+        %Message{
+          sender_id: nil,
+          sender_name: "Alex",
+          content: "OK. That's [cough] probably fine, thanks!"
+        },
+      ]
+    }
+  end
+
 end
