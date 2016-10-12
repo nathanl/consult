@@ -4,12 +4,10 @@ defmodule Consult.ChannelTest do
   setup do
     {:ok, _, socket} = socket() |> subscribe_and_join(Consult.PanelChannel, "panel_updates")
     {:ok, socket: socket}
-    # Explicitly get a connection before each test
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(TestApp.Repo)
   end
 
   test "sends an updated CS panel" do
-    Fixtures.insert_conversations
+    TestApp.Repo.insert!(Fixtures.ongoing_conversation)
     Consult.PanelChannel.send_update
     assert_broadcast "update", %{body: panel_body}
     assert Regex.match?(~r/\<h1\>Conversations\<\/h1\>/, panel_body)

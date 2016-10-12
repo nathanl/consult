@@ -1,12 +1,7 @@
 defmodule Fixtures do
-  alias TestApp.Repo
   alias Consult.{Conversation,Message}
 
-  def insert_conversations do
-    Repo.insert!(answered_conversation)
-  end
-
-  def answered_conversation do
+  def ongoing_conversation do
     %Conversation {
       messages: [
         %Message{
