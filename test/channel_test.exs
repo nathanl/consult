@@ -7,9 +7,11 @@ defmodule Consult.ChannelTest do
   end
 
   test "sends an updated CS panel" do
+    Fixtures.insert_conversations
     Consult.PanelChannel.send_update
     assert_broadcast "update", %{body: panel_body}
     assert Regex.match?(~r/\<h1\>Conversations\<\/h1\>/, panel_body)
+    assert Regex.match?(~r/\<div class="conversation"\>/, panel_body)
   end
 
 end
