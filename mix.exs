@@ -27,6 +27,10 @@ defmodule Consult.Mixfile do
       applications: [
         :logger,
         :phoenix,
+        :phoenix_pubsub,
+        :phoenix_html,
+        :phoenix_ecto,
+        :postgrex,
       ],
     ]
   end
@@ -49,6 +53,8 @@ defmodule Consult.Mixfile do
       {:phoenix, "~> 1.2"},
       {:phoenix_html, "~> 2.6"},
       {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix_ecto, "~> 3.0"},
+      {:postgrex, ">= 0.0.0"},
     ]
   end
 
