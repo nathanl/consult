@@ -1,15 +1,12 @@
 defmodule Consult.Conversation do
   use Ecto.Schema
-  import Ecto
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Consult.{Message,Tag,ConversationTag}
-
   schema "consult_conversations" do
-    has_many :messages, Message
-    has_many :conversation_tags, ConversationTag
-    many_to_many :tags, Tag, join_through: ConversationTag
+    has_many :messages, Consult.Message
+    has_many :conversation_tags, Consult.ConversationTag
+    many_to_many :tags, Consult.Tag, join_through: Consult.ConversationTag
     field :ended_at, Ecto.DateTime
 
     timestamps
@@ -54,7 +51,7 @@ defmodule Consult.Conversation do
 
     # Join the first message for each conversation
     def id_and_message_info(query) do
-      db_result = from conv in query, left_join: messages in fragment(
+      from conv in query, left_join: messages in fragment(
       """
       (SELECT
       conversation_id, sender_name, content,
