@@ -4,6 +4,8 @@ defmodule Consult.ChannelTest do
   setup do
     {:ok, _, socket} = socket() |> subscribe_and_join(Consult.PanelChannel, "panel_updates")
     {:ok, socket: socket}
+    # Explicitly get a connection before each test
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(TestApp.Repo)
   end
 
   test "sends an updated CS panel" do

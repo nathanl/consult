@@ -9,4 +9,4 @@ config :consult, TestApp.Repo,
   password: "postgres",
   database: "consult_test",
   hostname: "localhost",
-  pool_size: 10
+  pool: Ecto.Adapters.SQL.Sandbox
