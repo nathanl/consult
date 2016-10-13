@@ -6,10 +6,12 @@ defmodule Consult.PanelChannel do
   end
 
   def send_update do
-    Consult.Hooks.endpoint.broadcast(
+    apply(Application.get_env(:consult, :endpoint), :broadcast,
+      [
       "panel_updates",
       "update",
       %{body: Consult.ConversationSummary.html}
+      ]
     )
   end
 end

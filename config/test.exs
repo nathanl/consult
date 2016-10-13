@@ -10,3 +10,6 @@ config :consult, TestApp.Repo,
   database: "consult_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :consult, :endpoint, TestApp.Endpoint
+config :consult, :repo, TestApp.Repo

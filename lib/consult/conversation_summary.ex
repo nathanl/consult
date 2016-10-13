@@ -1,10 +1,9 @@
 defmodule Consult.ConversationSummary do
-  alias Consult.Hooks
-  require Hooks
   alias Consult.Conversation
   alias Conversation.{Scopes,Filters}
   require Ecto.Query
   @closed_conversation_count 10 # TODO make configurable
+  @repo Application.get_env(:consult, :repo)
 
   def html do
     {:safe, html_iodata} = Phoenix.View.render(
@@ -27,7 +26,7 @@ defmodule Consult.ConversationSummary do
     query
     |> Scopes.not_ended
     |> Scopes.sequential
-    |> Hooks.repo.all
+    |> @repo.all
     |> Filters.unanswered
   end
 
@@ -35,7 +34,7 @@ defmodule Consult.ConversationSummary do
     query
     |> Scopes.not_ended
     |> Scopes.sequential
-    |> Hooks.repo.all
+    |> @repo.all
     |> Filters.ongoing
   end
 
@@ -44,7 +43,7 @@ defmodule Consult.ConversationSummary do
     |> Scopes.ended
     |> Scopes.reverse_sequential
     |> Ecto.Query.limit(@closed_conversation_count)
-    |> Hooks.repo.all
+    |> @repo.all
   end
 
 end
