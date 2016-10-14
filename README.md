@@ -38,6 +38,37 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ##  Setup
 
+### Tables
+
 Consult requires some database tables for conversations, messages, and associated data.
 
 Run `mix consult.show_expected_structure` to see an example migration that would add the tables it needs, then either create and run an identical migration, or write your own migration to make your schema match the one shown.
+
+### Router and Endpoint
+
+To your Phoenix routes file, add this:
+
+```elixir
+forward "/consult", Consult.Routes
+```
+
+To your Endpoint, add this:
+
+```elixir
+use Consult.Socket
+```
+
+In your Mix configuration (eg, `config.exs` or an environment-specific one), add lines like the following, referencing your own endpoint and ecto Repo modules:
+
+```elixir
+config :consult, :endpoint, MyApp.Endpoint
+config :consult, :repo, MyApp.Repo
+config :consult, :hooks, MyApp.ConsultHooks
+```
+
+The `ConsultHook` module must define the following functions:
+
+- `user_for_request(conn)` - must return a map or struct representing the user for the current request. `user.id` and `user.name` are required fields, but both can have `nil` values if (for instance) the user is not logged in.
+- `representative?(user)` accepts one of the user maps returned by `user_for_request(conn)` and returns a boolean, answering the question "is this person allowed to function as a customer service representative - for example, to answer user chat requests?"
+
+(TODO - describe how to set up the other hooks.)

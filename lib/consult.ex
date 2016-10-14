@@ -15,4 +15,21 @@ defmodule Consult do
       supervisor(TestApp.Repo, []),
     ]
   end
+
+  def children_for_environment(_) do
+    []
+  end
+
+  def repo do
+    Application.get_env(:consult, :repo)
+  end
+
+  def endpoint do
+    Application.get_env(:consult, :repo)
+  end
+
+  def hooks do
+    Application.get_env(:consult, :hooks_module)
+  end
+
 end

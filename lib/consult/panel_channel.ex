@@ -5,6 +5,10 @@ defmodule Consult.PanelChannel do
     {:ok, socket}
   end
 
+  def the_endpoint do
+    Application.get_env(:consult, :endpoint)
+  end
+
   def send_update do
     apply(Application.get_env(:consult, :endpoint), :broadcast,
       [
