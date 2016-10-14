@@ -1,4 +1,4 @@
-defmodule TestApp.Repo.Migrations.AddConversationsMessagesAndTags do
+defmodule TestApp.Repo.Migrations.CreateConsultTables do
   use Ecto.Migration
 
   def change do
@@ -20,6 +20,14 @@ defmodule TestApp.Repo.Migrations.AddConversationsMessagesAndTags do
     create table(:consult_tags) do
       add :name, :string, size: 64
     end
+
+    create table(:consult_notes) do
+      add :conversation_id, references(:consult_conversations)
+      add :content, :text, null: false
+      add :author_name, :string, null: false
+      add :author_id, :string
+    end
+    create index(:consult_notes, [:conversation_id])
 
     create table(:consult_conversations_tags) do
       add :conversation_id, references(:consult_conversations)
