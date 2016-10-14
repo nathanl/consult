@@ -28,13 +28,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     end
     ```
 
-  2. Ensure `consult` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:consult]]
-    end
-    ```
+  2. `mix deps.get`
 
 ##  Setup
 
@@ -63,7 +57,7 @@ In your Mix configuration (eg, `config.exs` or an environment-specific one), add
 ```elixir
 config :consult, :endpoint, MyApp.Endpoint
 config :consult, :repo, MyApp.Repo
-config :consult, :hooks, MyApp.ConsultHooks
+config :consult, :hooks_module, MyApp.ConsultHooks
 ```
 
 The `ConsultHook` module must define the following functions:
@@ -71,4 +65,27 @@ The `ConsultHook` module must define the following functions:
 - `user_for_request(conn)` - must return a map or struct representing the user for the current request. `user.id` and `user.name` are required fields, but both can have `nil` values if (for instance) the user is not logged in.
 - `representative?(user)` accepts one of the user maps returned by `user_for_request(conn)` and returns a boolean, answering the question "is this person allowed to function as a customer service representative - for example, to answer user chat requests?"
 
-(TODO - describe how to set up the other hooks.)
+### Templates
+
+Wherever you'd like to display a chatbox in your template, use:
+
+```eex
+<%= render Consult.ChatboxView, "_chatbox.html" %>
+```
+
+### Brunch and Assets
+
+Note: this is the part that I understand least, because JavaScript. `¯\_(ツ)_/¯` But this is what worked for me.
+
+In your Phoenix app's brunch config
+
+- Add this to your `watched` section `"../consult/web/static"`
+- To the `stylesheets.order` section, add `before: ["../consult/web/static/css/consult.css"]`
+
+In your Javascript, do this:
+
+```javascript
+import {Socket} from "phoenix"
++import "../../../../consult/web/static/js/consult.js"
+EnableConsult(Socket)
+```
