@@ -25,7 +25,7 @@ defmodule Consult do
   end
 
   def endpoint do
-    Application.get_env(:consult, :repo)
+    Application.get_env(:consult, :endpoint)
   end
 
   def hooks do

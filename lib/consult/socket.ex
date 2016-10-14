@@ -9,7 +9,7 @@ defmodule Consult.Socket do
 
   ## Channels
   channel "conversation:*", Consult.RoomChannel
-  channel "cs_panel", Consult.CsPanelChannel
+  channel "cs_panel", Consult.PanelChannel
 
   ## Transports
   ## TODO make configurable?

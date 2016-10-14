@@ -1,15 +1,3 @@
-// import Phoenix from "phoenix"
-// import {Socket} from "phoenix" // Maybe walk the path to find node modules
-//
-// window.EatMyShorts = function() {
-//   console.log("go ahead, eat them")
-// }
-// function EverythingIsAwesomeNotReally(message) {
-//   console.log("or maybe it is!?!?!")
-// }
-//
-// module.exports = EverythingIsAwesomeNotReally;
-// window.ShutTheCrapUp = function() { console.log("shut it"); return "yeah" }
 window.EnableConsult = function(socketModule) {
   let cookie = {
     read: function(name) {
@@ -230,7 +218,7 @@ window.EnableConsult = function(socketModule) {
     socket.connect()
     let channel = socket.channel("cs_panel", {})
 
-    channel.on("panel_update", payload => {
+    channel.on("update", payload => {
       main.innerHTML = payload.main_contents
     })
 

@@ -1,0 +1,86 @@
+#chatbox {
+  padding: 0.5em;
+  border: 1px solid black;
+  background-color: #ddd;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  width: 40%;
+}
+
+#chatbox textarea {
+  width: 80%;
+}
+
+#chatbox.cs-support {
+  position: relative;
+  width: 100%;
+}
+
+#chatbox .widget {
+  padding: 1em;
+}
+
+#chatbox #chatbox-messages {
+  max-height: 12em;
+  overflow-y: scroll;
+}
+
+#chatbox .chatbox-label {
+  color: green;
+  position: relative;
+}
+
+#chatbox .chatbox-message {
+  white-space: pre-wrap;
+}
+
+#chatbox .chatbox-message:nth-child(odd) {
+  background-color: white;
+}
+
+#chatbox .chatterbox-message-sender {
+  font-weight: bold;
+}
+
+#chatbox .chatterbox-message-timestamp {
+  font-size: 0.75em;
+  font-style: italic;
+}
+
+#chatbox .chatterbox-message-contents {
+  display: block;
+}
+
+#chatbox .chatbox-error {
+  color: red;
+}
+
+#chatbox button#chatbox-close-chat {
+  background-color: red;
+  color: white;
+  margin-left: 10px;
+}
+
+#chatbox .state                   { display: none; }
+#chatbox.inactive .inactive.state { display: block; }
+#chatbox.loading  .loading.state  { display: block; }
+#chatbox.active   .active.state   { display: block; }
+#chatbox.ended    .active.state   { display: block; opacity: 0.8; }
+
+#chatbox.inactive { background: none; border: none; }
+#chatbox.inactive button#chatbox-startchat { background: #eef; border: none; }
+#chatbox.inactive button#chatbox-startchat { font-size: 3em; }
+#chatbox.inactive button#chatbox-startchat:before { content: "💬" }
+
+#chatbox .loading.state { padding: 1.5em; font-size: 1.5em;}
+
+#chatterbox-dashboard .conversation-tag {
+  background-color: #ccc;
+  border: 1px solid black;
+  border-radius: 10%;
+  padding: 0 0.3em;
+}
+
+#chatterbox-dashboard .conversation-tag.bug { background-color: #f44; }
+#chatterbox-dashboard .user-name { font-weight: bold; }
