@@ -15,6 +15,7 @@ defmodule TestApp.Repo.Migrations.AddConversationsMessagesAndTags do
 
       timestamps
     end
+    create index(:consult_messages, [:conversation_id])
 
     create table(:consult_tags) do
       add :name, :string, size: 64
@@ -26,5 +27,10 @@ defmodule TestApp.Repo.Migrations.AddConversationsMessagesAndTags do
 
       timestamps
     end
+    create index(:consult_conversations_tags, [:conversation_id])
+    create index(:consult_conversations_tags, [:tag_id])
+    create unique_index(
+      :consult_conversations_tags, [:conversation_id, :tag_id]
+    )
   end
 end
