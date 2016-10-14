@@ -72,7 +72,7 @@ defmodule Consult.Conversation do
       -- If user and rep both have no id and are both named 'Alex',
       -- that will be a weird edge case and we'll think there's only
       -- one participant.
-      COUNT(DISTINCT CONCAT(COALESCE(sender_id, 0), COALESCE(sender_name, 'NONE'))) AS participant_count
+      COUNT(DISTINCT CONCAT(COALESCE(sender_id, '0'), COALESCE(sender_name, 'NONE'))) AS participant_count
       FROM consult_messages
       GROUP BY conversation_id
       )

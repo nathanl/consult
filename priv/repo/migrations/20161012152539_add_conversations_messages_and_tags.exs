@@ -11,7 +11,7 @@ defmodule TestApp.Repo.Migrations.AddConversationsMessagesAndTags do
       add :conversation_id, references(:consult_conversations)
       add :content, :text, null: false
       add :sender_name, :string, null: false
-      add :sender_id, :integer
+      add :sender_id, :string
 
       timestamps
     end

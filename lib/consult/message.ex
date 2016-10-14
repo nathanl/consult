@@ -10,7 +10,7 @@ defmodule Consult.Message do
     belongs_to :conversation, Consult.Conversation
     field :content, :string # limit to ~3k?
     field :sender_name, :string
-    field :sender_id, :integer
+    field :sender_id, :string
 
     timestamps
   end
