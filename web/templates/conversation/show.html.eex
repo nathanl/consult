@@ -2,14 +2,16 @@
 
 <%= link "All Conversations", to: "/consult/conversations" %>
 
-<% # TODO use path helper %>
-<%= form_for @conn, "/consult/set_tags/#{@id}", [as: :conversation_tags], fn f -> %>
-  <%= label(f, :tag_ids, "Tags") %>
-  <%= for {name, id} <- @possible_tags do %>
-    <% checked = id in @current_tag_ids %>
-    <%= checkbox :tag_ids, "#{id}", value: name, checked: checked %> <%= name %>
-    <%= end %>
-  <%= submit "Update Tags", disabled: false %>
+<%= if Enum.any?(@possible_tags) do %>
+  <% # TODO use path helper %>
+  <%= form_for @conn, "/consult/set_tags/#{@id}", [as: :conversation_tags], fn f -> %>
+    <%= label(f, :tag_ids, "Tags") %>
+    <%= for {name, id} <- @possible_tags do %>
+      <% checked = id in @current_tag_ids %>
+      <%= checkbox :tag_ids, "#{id}", value: name, checked: checked %> <%= name %>
+      <%= end %>
+    <%= submit "Update Tags", disabled: false %>
+  <% end %>
 <% end %>
 
-<%= render Consult.ConversationView, "_chatbox.html", chatbox_class: "cs-support#{if @ended, do: " ended"}", conversation_id: @id, ended: @ended %>
+<%= render Consult.ChatboxView, "_chatbox.html", chatbox_class: "cs-support#{if @ended, do: " ended"}", conversation_id: @id, ended: @ended %>
