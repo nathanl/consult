@@ -14,7 +14,7 @@
   <body>
     <div class="container">
       <header class="header">
-        Current User: <%= Consult.hooks.user_for_request(@conn).name %>
+        Current User: <%= Consult.hooks_module.user_for_request(@conn).name %>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>

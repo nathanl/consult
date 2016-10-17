@@ -9,7 +9,7 @@ defmodule Consult.ChatSessionController do
     render_data = case conversation do
       nil -> %{error: "The requested conversation does not exist"}
       %Conversation{} ->
-        cs_rep = Consult.hooks.user_for_request(conn)
+        cs_rep = Consult.hooks_module.user_for_request(conn)
         user_id_token = user_id_token(conn, cs_rep)
         conversation_id_token = Phoenix.Token.sign(conn, "conversation_id", conversation_id)
         %{
@@ -26,7 +26,7 @@ defmodule Consult.ChatSessionController do
   end
 
   def get_help(conn, %{"conversation_id_token" => conversation_id_token}) do
-    user = Consult.hooks.user_for_request(conn)
+    user = Consult.hooks_module.user_for_request(conn)
     
     user_id_token = user_id_token(conn, user)
 

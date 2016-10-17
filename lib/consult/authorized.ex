@@ -11,8 +11,8 @@ defmodule Consult.Authorized do
   end
 
   defp is_authorized?(conn) do
-    user = Consult.hooks.user_for_request(conn)
-    if Consult.hooks.representative?(user) do
+    user = Consult.hooks_module.user_for_request(conn)
+    if Consult.hooks_module.representative?(user) do
       conn 
     else
       conn
