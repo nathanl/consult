@@ -33,7 +33,7 @@ defmodule Consult.ConversationChannel do
 
   def handle_in("new_msg", %{"body" => body, "user_name" => user_name, "user_id_token" => user_id_token}, socket) do
     %Conversation{ended_at: nil} = Consult.repo.get_by!(Conversation, id: socket.assigns[:conversation_id])
-    message = record_message(socket, socket.assigns[:conversation_id], body, user_id_token, user_name)
+    message = record_message(socket.assigns[:conversation_id], body, user_id_token, user_name)
 
     broadcast!(socket, "new_msg", %{timestamp: Ecto.DateTime.to_string(message.inserted_at), from: user_name, body: body,  })
     Consult.PanelChannel.send_update
@@ -43,7 +43,7 @@ defmodule Consult.ConversationChannel do
   def handle_in("conversation_closed", %{"ended_by" => ended_by, "user_id_token" => user_id_token, "ended_at" => ended_at}, socket) do
     body = "[Conversation ended by #{ended_by} at #{ended_at}]"
     sender_name = "System"
-    message = record_message(socket, socket.assigns[:conversation_id], body, user_id_token, sender_name)
+    message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name)
 
     broadcast!(socket, "new_msg", %{timestamp: Ecto.DateTime.to_string(message.inserted_at), from: sender_name, body: body})
     broadcast!(socket, "conversation_closed", %{})
@@ -51,7 +51,7 @@ defmodule Consult.ConversationChannel do
     {:noreply, socket}
   end
 
-  defp record_message(socket, conversation_id, content, user_id_token, sender_name) do
+  defp record_message(conversation_id, content, user_id_token, sender_name) do
     user_id = Consult.Token.verify_user_id(user_id_token)
 
     new_message =
