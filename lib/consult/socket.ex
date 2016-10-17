@@ -8,7 +8,7 @@ defmodule Consult.Socket do
   end
 
   ## Channels
-  channel "conversation:*", Consult.RoomChannel
+  channel "conversation:*", Consult.ConversationChannel
   channel "cs_panel", Consult.PanelChannel
 
   ## Transports

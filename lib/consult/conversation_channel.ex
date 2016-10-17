@@ -1,4 +1,4 @@
-defmodule Consult.RoomChannel do
+defmodule Consult.ConversationChannel do
   use Phoenix.Channel
   alias Consult.{Conversation,Message}
   require Ecto.Query
@@ -54,10 +54,7 @@ defmodule Consult.RoomChannel do
   end
 
   defp record_message(socket, conversation_id, content, user_id_token, sender_name) do
-    user_id = case Phoenix.Token.verify(socket, "user_id", user_id_token) do
-      {:ok, verified_id} -> verified_id
-      _ -> nil
-    end
+    user_id = Consult.Token.verify_user_id(user_id_token)
 
     new_message =
       %Message{content: content, conversation_id: conversation_id, sender_name: sender_name, sender_id: user_id}
