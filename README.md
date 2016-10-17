@@ -77,7 +77,7 @@ Wherever you'd like to display a chatbox in your template, use:
 
 ### Brunch and Assets
 
-Note: this is the part that I understand least, because JavaScript. `¯\_(ツ)_/¯` But this is what worked for me.
+Note: this is the part that I understand least, because Brunch. 😆 But this is what worked for me.
 
 In your Phoenix app's brunch config
 

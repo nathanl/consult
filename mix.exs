@@ -1,10 +1,12 @@
 defmodule Consult.Mixfile do
   use Mix.Project
 
+  @version "0.0.1"
+
   def project do
     [
       app: :consult,
-      version: "0.1.0",
+      version: @version,
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -15,6 +17,24 @@ defmodule Consult.Mixfile do
       start_permanent: Mix.env == :prod,
       compilers: [:phoenix] ++ Mix.compilers,
       deps: deps,
+
+      # For ExDoc
+      name: "Consult",
+      docs: [
+        extras: ["README.md"],
+        main: "readme",
+        source_ref: "v#{@version}",
+        source_url: "https://github.com/nathanl/consult",
+        homepage_url: "https://github.com/nathanl/consult",
+      ],
+    ]
+  end
+
+  def package do
+    [
+      maintainers: ["Nathan Long - him@nathanmlong.com"],
+      licenses: ["MIT"],
+      links: %{"Github" => "https://github.com/nathanl/swappy"}
     ]
   end
 
@@ -55,6 +75,8 @@ defmodule Consult.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
+      {:ex_doc, "~> 0.10", only: :dev},
+      {:earmark, ">= 0.0.0", only: :dev},
     ]
   end
 
