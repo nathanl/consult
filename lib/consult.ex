@@ -2,7 +2,7 @@ defmodule Consult do
   use Application
   import Supervisor.Spec
 
-  def start(type, args) do
+  def start(_type, _args) do
     # TODO is this an OK way to adjust per environment?
     children = children_for_environment(Mix.env)
     opts = [strategy: :one_for_one, name: Consult.Supervisor]

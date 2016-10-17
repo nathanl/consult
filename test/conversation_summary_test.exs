@@ -19,7 +19,7 @@ defmodule Consult.ConversationSummaryTest do
   test "for 'unanswered' vs 'ongoing', checks unique participants by id AND name" do
     TestApp.Repo.insert!(Fixtures.ongoing_conversation(%{rep_id: nil}))
     [
-      {"Unanswered", unanswered}, {"Ongoing", ongoing}, {"Ended", ended}
+      {_, unanswered}, {_, ongoing}, {_, _ended}
     ] = Summary.conversations
     assert Enum.count(unanswered ) == 0
     assert Enum.count(ongoing    ) == 1
