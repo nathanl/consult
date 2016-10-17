@@ -86,6 +86,6 @@ In your Javascript, do this:
 
 ```javascript
 import {Socket} from "phoenix"
-+import "../../../../consult/web/static/js/consult.js"
+import "../../../../consult/web/static/js/consult.js"
 EnableConsult(Socket)
 ```
