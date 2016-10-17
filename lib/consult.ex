@@ -49,5 +49,4 @@ defmodule Consult do
     raise ConfigError, message: "missing config value '#{name}' for :consult"
   end
 
-
 end
