@@ -30,6 +30,8 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
   2. `mix deps.get`
 
+  3.  Add `:consult` to your list of applications in `def application`.
+
 ##  Setup
 
 ### Tables
