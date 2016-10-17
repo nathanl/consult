@@ -1,6 +1,10 @@
 defmodule Fixtures do
   alias Consult.{Conversation,Message}
 
+  def new_conversation do
+    %Conversation{}
+  end
+
   def ongoing_conversation(options \\ %{rep_id: "1"}) do
     %Conversation {
       messages: [

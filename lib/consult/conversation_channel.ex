@@ -4,9 +4,7 @@ defmodule Consult.ConversationChannel do
   require Ecto.Query
 
   def join("conversation:" <> requested_id, %{"conversation_id_token" => conversation_id_token}, socket) do
-    {:ok, authorized_id} = Phoenix.Token.verify(
-      socket, "conversation_id", conversation_id_token
-    )
+    authorized_id = Consult.Token.verify_conversation_id(conversation_id_token)
     [requested_id, authorized_id] = Enum.map([requested_id, authorized_id], &ensure_integer/1)
     
     if requested_id == authorized_id do

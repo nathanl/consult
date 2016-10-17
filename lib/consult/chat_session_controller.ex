@@ -11,7 +11,7 @@ defmodule Consult.ChatSessionController do
       %Conversation{} ->
         cs_rep = Consult.hooks_module.user_for_request(conn)
         user_id_token = Consult.Token.sign_user_id(cs_rep.id)
-        conversation_id_token = Phoenix.Token.sign(conn, "conversation_id", conversation_id)
+        conversation_id_token = Consult.Token.sign_conversation_id(conversation_id)
         %{
           user_id_token: user_id_token,
           user_name: cs_rep.name || "Representative",
@@ -30,9 +30,9 @@ defmodule Consult.ChatSessionController do
     
     user_id_token = Consult.Token.sign_user_id(user.id)
 
-    conversation_id = new_or_existing_conversation_id(conn, conversation_id_token)
+    conversation_id = Consult.ConversationSource.id_for(conversation_id_token)
 
-    conversation_id_token = Phoenix.Token.sign(conn, "conversation_id", conversation_id)
+    conversation_id_token = Consult.Token.sign_conversation_id(conversation_id)
 
     render_data = %{user_id_token: user_id_token, user_name: user.name || "User", channel_name: "conversation:#{conversation_id}", conversation_id_token: conversation_id_token}
 
@@ -42,9 +42,8 @@ defmodule Consult.ChatSessionController do
   end
 
   def close_conversation(conn, %{"conversation_id_token" => conversation_id_token}) do
-    closed_conversation = with {:ok, conversation_id} <- Phoenix.Token.verify(
-      conn, "conversation_id", conversation_id_token
-    ), conversation <- Consult.repo.get_by(Conversation, id: conversation_id),
+    closed_conversation = with convo_id <- Consult.Token.verify_conversation_id(conversation_id_token),
+    conversation <- Consult.repo.get_by(Conversation, id: convo_id),
     %Conversation{} <- conversation do
       {:ok, conversation} = Conversation.end_now(conversation) |> Consult.repo.update
       conversation
@@ -57,17 +56,4 @@ defmodule Consult.ChatSessionController do
     |> send_resp(200, Poison.encode!(render_data))
   end
 
-  defp new_or_existing_conversation_id(conn, convo_id_token) do
-    with {:ok, convo_id} <- Phoenix.Token.verify(
-      conn, "conversation_id", convo_id_token
-    ), 
-    %Conversation{} <- Consult.repo.get_by(Conversation, id: convo_id) do
-      convo_id
-    else
-      _ ->
-        new_conversation = Conversation.changeset(%Conversation{})
-        {:ok, new_conversation} = Consult.repo.insert(new_conversation)
-        new_conversation.id
-    end 
-  end
 end
