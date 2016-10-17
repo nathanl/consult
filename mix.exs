@@ -7,10 +7,10 @@ defmodule Consult.Mixfile do
     [
       app: :consult,
       version: @version,
-      build_path: "../../_build",
-      config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
+      # build_path: "../../_build",
+      # config_path: "../../config/config.exs",
+      # deps_path: "../../deps",
+      # lockfile: "../../mix.lock",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -32,7 +32,8 @@ defmodule Consult.Mixfile do
 
   def package do
     [
-      maintainers: ["Nathan Long - him@nathanmlong.com"],
+      files:       ["lib", "priv", "web", "mix.exs", "README.md"],
+      maintainers: ["Nathan Long <him@nathanmlong.com>"],
       licenses: ["MIT"],
       links: %{"Github" => "https://github.com/nathanl/swappy"}
     ]
