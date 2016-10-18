@@ -190,9 +190,7 @@ window.EnableConsult = function(socketModule) {
       this.disable = function() {
         // may happen after reset or before,
         // depending on which party hangs up
-        if (this.chatBox.className.trim() == "active") {
-          this.chatBox.className = "ended"
-        }
+        this.swapClass(this.chatBox, "active", "ended")
         chat.socket.disconnect()
         if (this.userIsCsRep) {
           this.closeChatButton.parentNode.removeChild(this.closeChatButton)
@@ -209,8 +207,13 @@ window.EnableConsult = function(socketModule) {
         return (!string || /^\s*$/.test(string))
       }
 
-      this.swapClass = function(element, remove, add) {
-        element.className = element.className.replace(remove, add)
+      this.swapClass = function(element, oldClass, newClass) {
+        let classes = element.className.trim().split(/\s+/)
+        let oldIndex = classes.indexOf(oldClass)
+        if (oldIndex !== -1) {
+          classes[oldIndex] = newClass
+          element.className = classes.join(" ")
+        }
       }
 
     }
