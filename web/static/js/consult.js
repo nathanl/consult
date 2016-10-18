@@ -96,10 +96,6 @@ window.EnableConsult = function(socketModule) {
                 user_name: user_name,
                 user_id_token: user_id_token,
               })
-              .receive("ok", response => {
-                // TODO - uh, this is useless, right? handled above?
-                response.messages.forEach(body => chat.addMessage(response.from, body))
-              })
             })
           }
         )
