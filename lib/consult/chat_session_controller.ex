@@ -20,9 +20,7 @@ defmodule Consult.ChatSessionController do
         }
     end
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(render_data))
+    send_json_response(conn, render_data)
   end
 
   def get_help(conn, %{"conversation_id_token" => conversation_id_token}) do
@@ -36,9 +34,7 @@ defmodule Consult.ChatSessionController do
 
     render_data = %{user_id_token: user_id_token, user_name: user.name || "User", channel_name: "conversation:#{conversation_id}", conversation_id_token: conversation_id_token}
 
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(render_data))
+    send_json_response(conn, render_data)
   end
 
   def close_conversation(conn, %{"conversation_id_token" => conversation_id_token}) do
@@ -51,6 +47,10 @@ defmodule Consult.ChatSessionController do
 
     render_data = %{ended_at: Ecto.DateTime.to_string(closed_conversation.ended_at)}
 
+    send_json_response(conn, render_data)
+  end
+
+  defp send_json_response(conn, render_data) do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!(render_data))
