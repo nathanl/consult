@@ -181,20 +181,28 @@ window.EnableConsult = function(socketModule) {
               user_id_token: this.user_id_token,
             })
             if (!this.userIsCsRep) {
-              this.chatBox.parentNode.removeChild(this.chatBox)
+              this.reset()
             }
           }
         )
       }
 
       this.disable = function() {
-        chat.swapClass(this.chatBox, "active", "ended")
+        // may happen after reset or before,
+        // depending on which party hangs up
+        if (this.chatBox.className.trim() == "active") {
+          this.chatBox.className = "ended"
+        }
         chat.socket.disconnect()
-        this.onSubmit = function(event) { event.preventDefault() }
-        this.chatInput.parentNode.removeChild(this.chatInput)
         if (this.userIsCsRep) {
           this.closeChatButton.parentNode.removeChild(this.closeChatButton)
         }
+      }
+
+      this.reset = function() {
+        chatMessages.innerHTML = ""
+        this.chatBox.className = "inactive"
+        this.chatStarted = false
       }
 
       this.isBlank = function(string) {

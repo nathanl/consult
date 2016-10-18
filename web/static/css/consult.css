@@ -67,6 +67,7 @@
 #chatbox.loading  .loading.state  { display: block; }
 #chatbox.active   .active.state   { display: block; }
 #chatbox.ended    .active.state   { display: block; opacity: 0.8; }
+#chatbox.ended    #chatbox-input  { display: none; }
 
 #chatbox.inactive { background: none; border: none; }
 #chatbox.inactive button#chatbox-startchat { background: #eef; border: none; }
