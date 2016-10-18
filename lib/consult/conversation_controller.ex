@@ -4,7 +4,7 @@ defmodule Consult.ConversationController do
 
   alias Consult.{Conversation,Tag,ConversationTag}
 
-  plug Consult.Authorized when action in [:index, :show, :set_tags]
+  plug Consult.Authorized
 
   def index(conn, _assigns) do
     conversations = Consult.ConversationSummary.conversations
