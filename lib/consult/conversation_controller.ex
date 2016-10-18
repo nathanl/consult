@@ -4,7 +4,7 @@ defmodule Consult.ConversationController do
 
   alias Consult.{Conversation,Tag,ConversationTag}
 
-  plug Consult.Authorized
+  plug Consult.RepresentativesOnly
 
   def index(conn, _assigns) do
     conversations = Consult.ConversationSummary.conversations

@@ -2,7 +2,7 @@ defmodule Consult.ChatSessionController do
   use Phoenix.Controller
   alias Consult.Conversation
 
-  plug Consult.Authorized when action in [:give_help]
+  plug Consult.RepresentativesOnly when action in [:give_help]
 
   def give_help(conn, %{"conversation_id" => conversation_id}) do
     conversation = Consult.repo.get_by(Conversation, id: conversation_id)

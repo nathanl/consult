@@ -1,4 +1,4 @@
-defmodule Consult.Authorized do
+defmodule Consult.RepresentativesOnly do
   @behaviour Plug
   import Plug.Conn
 
