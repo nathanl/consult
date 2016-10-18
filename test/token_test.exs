@@ -2,7 +2,7 @@ defmodule Consult.TokenTest do
   use ExUnit.Case
 
   test "signs and verifies an integer user id" do
-    user_id = :random.uniform(10_000)
+    user_id = :rand.uniform(10_000)
     token = Consult.Token.sign_user_id(user_id)
     assert user_id == Consult.Token.verify_user_id(token)
   end
@@ -20,13 +20,13 @@ defmodule Consult.TokenTest do
   end
 
   test "signs and verifies an integer conversation id" do
-    conversation_id = :random.uniform(10_000)
+    conversation_id = :rand.uniform(10_000)
     token = Consult.Token.sign_conversation_id(conversation_id)
     assert conversation_id == Consult.Token.verify_conversation_id(token)
   end
 
   test "signs and verifies string conversation id that contains an integer" do
-    conversation_id = :random.uniform(10_000) |> Integer.to_string
+    conversation_id = :rand.uniform(10_000) |> Integer.to_string
     token = Consult.Token.sign_conversation_id(conversation_id)
     assert conversation_id == Consult.Token.verify_conversation_id(token)
   end

@@ -1,9 +1,6 @@
 defmodule Consult.Message do
   use Ecto.Schema
-  import Ecto
-  import Ecto.Changeset
   import Ecto.Query
-  alias Consult.Message
 
   schema "consult_messages" do
 
@@ -19,7 +16,7 @@ defmodule Consult.Message do
   @allowed_fields @required_fields ++ ~w(sender_id)
   @max_content_size 4096 # arbitrary
   
-  def changeset(model, params \\ %{}) do
+  def changeset(model, _params \\ %{}) do
     model
     # TODO fix casting - doesn't understand conversation_id
     # |> cast(params, @allowed_fields)

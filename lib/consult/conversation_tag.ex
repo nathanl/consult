@@ -1,13 +1,11 @@
 defmodule Consult.ConversationTag do
   use Ecto.Schema
-  import Ecto
   import Ecto.Changeset
-  import Ecto.Query
-  alias Consult.{Conversation,ConversationTag,Tag}
+  alias Consult.ConversationTag
 
   schema "consult_conversations_tags" do
-    belongs_to :conversation, Conversation
-    belongs_to :tag, Tag
+    belongs_to :conversation, Consult.Conversation
+    belongs_to :tag, Consult.Tag
 
     timestamps
   end

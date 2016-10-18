@@ -15,3 +15,4 @@ config :consult, TestApp.Endpoint, secret_key_base: "abc123"
 config :consult, :endpoint, TestApp.Endpoint
 config :consult, :repo, TestApp.Repo
 
+config :logger, level: :warn

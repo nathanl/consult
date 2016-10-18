@@ -1,6 +1,6 @@
 defmodule Consult.ConversationSourceTest do
   use Consult.ModelCase
-  alias Consult.{Conversation,ConversationSource}
+  alias Consult.ConversationSource
 
   test "creates a new conversation if the token is null" do
     conversation = TestApp.Repo.insert!(Fixtures.new_conversation)
