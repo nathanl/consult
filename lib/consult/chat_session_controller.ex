@@ -9,32 +9,15 @@ defmodule Consult.ChatSessionController do
     render_data = case conversation do
       nil -> %{error: "The requested conversation does not exist"}
       %Conversation{} ->
-        cs_rep = Consult.hooks_module.user_for_request(conn)
-        user_id_token = Consult.Token.sign_user_id(cs_rep.id)
-        conversation_id_token = Consult.Token.sign_conversation_id(conversation_id)
-        %{
-          user_id_token: user_id_token,
-          user_name: cs_rep.name || "Representative",
-          channel_name: "conversation:#{conversation_id}",
-          conversation_id_token: conversation_id_token
-        }
+        chat_session_info(conn, "Representative", conversation_id)
     end
 
     send_json_response(conn, render_data)
   end
 
   def get_help(conn, %{"conversation_id_token" => conversation_id_token}) do
-    user = Consult.hooks_module.user_for_request(conn)
-    
-    user_id_token = Consult.Token.sign_user_id(user.id)
-
     conversation_id = Consult.ConversationSource.id_for(conversation_id_token)
-
-    conversation_id_token = Consult.Token.sign_conversation_id(conversation_id)
-
-    render_data = %{user_id_token: user_id_token, user_name: user.name || "User", channel_name: "conversation:#{conversation_id}", conversation_id_token: conversation_id_token}
-
-    send_json_response(conn, render_data)
+    send_json_response(conn, chat_session_info(conn, "User", conversation_id))
   end
 
   def close_conversation(conn, %{"conversation_id_token" => conversation_id_token}) do
@@ -54,6 +37,16 @@ defmodule Consult.ChatSessionController do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(200, Poison.encode!(render_data))
+  end
+
+  defp chat_session_info(conn, default_name, conversation_id) do
+    user = Consult.hooks_module.user_for_request(conn)
+    %{
+      user_id_token: Consult.Token.sign_user_id(user.id),
+      user_name: user.name || default_name,
+      channel_name: "conversation:#{conversation_id}",
+      conversation_id_token: Consult.Token.sign_conversation_id(conversation_id),
+    }
   end
 
 end
