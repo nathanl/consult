@@ -13,12 +13,11 @@ defmodule Consult.ConversationController do
 
   def show(conn, %{"id" => conversation_id}) do
     conversation = conversation_with_tags(conversation_id)
-    possible_tags = Consult.repo.all(Tag) |> Enum.map(fn(tag) -> {tag.name, tag.id} end)
     render(conn, "show.html", %{
       id: conversation_id,
       layout: {Consult.ConversationView, "layout.html"},
       ended: Conversation.ended?(conversation),
-      possible_tags: possible_tags,
+      possible_tags: Tag.options,
       current_tag_ids: (conversation.conversation_tags |> Enum.map(&(&1.tag_id))),
     })
   end

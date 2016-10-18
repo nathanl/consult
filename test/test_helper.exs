@@ -1,3 +1,4 @@
+ExUnit.configure(exclude: [skip: true])
 ExUnit.start()
 
 Ecto.Migrator.run(TestApp.Repo, "priv/repo/migrations", :up, all: true)

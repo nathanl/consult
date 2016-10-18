@@ -1,8 +1,16 @@
 defmodule Fixtures do
-  alias Consult.{Conversation,Message}
+  alias Consult.{Conversation,Message,Tag}
 
   def new_conversation do
     %Conversation{}
+  end
+
+  def conversation_with_tags(tag_names) do
+    %Conversation {
+      tags: Enum.map(tag_names, fn (tag_name) ->
+        %Tag{name: tag_name}
+      end)
+    }
   end
 
   def ongoing_conversation(options \\ %{rep_id: "1"}) do
