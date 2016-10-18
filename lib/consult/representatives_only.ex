@@ -7,10 +7,10 @@ defmodule Consult.RepresentativesOnly do
   end
 
   def call(conn, :no_options) do
-    is_authorized?(conn)
+    restrict_unless_is_representative(conn)
   end
 
-  defp is_authorized?(conn) do
+  defp restrict_unless_is_representative(conn) do
     user = Consult.hooks_module.user_for_request(conn)
     if Consult.hooks_module.representative?(user) do
       conn 
