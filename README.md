@@ -24,7 +24,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:consult, "~> 0.1.0"}]
+      [{:consult, "~> 0.0.1"}]
     end
     ```
 
@@ -62,10 +62,32 @@ config :consult, :repo, MyApp.Repo
 config :consult, :hooks_module, MyApp.ConsultHooks
 ```
 
-The `ConsultHook` module must define the following functions:
+The hooks module referenced in the configuration must define the following functions:
 
 - `user_for_request(conn)` - must return a map or struct representing the user for the current request. `user.id` and `user.name` are required fields, but both can have `nil` values if (for instance) the user is not logged in.
 - `representative?(user)` accepts one of the user maps returned by `user_for_request(conn)` and returns a boolean, answering the question "is this person allowed to function as a customer service representative - for example, to answer user chat requests?"
+
+Here's the simplest possible implementation:
+
+```elixir
+defmodule MyApp.ConsultHooks do
+
+  def user_for_request(conn) do
+    # doesn't bother checking session, so
+    # all chat users are anonymous
+    %{id: nil, name: nil}
+  end
+
+  # 'user' is a return value from 'user_for_request'
+  def representative?(user) do
+    # doesn't bother inspecting user, so all users
+    # can see and answer incoming user chats
+    # in the customer support dashboard
+    true
+  end
+
+end
+```
 
 ### Templates
 
@@ -91,3 +113,9 @@ import {Socket} from "phoenix"
 import "../../../../consult/web/static/js/consult.js"
 EnableConsult(Socket)
 ```
+
+## Usage
+
+Users can start chats from anywhere you put the chat box.
+
+Representatives can answer chats in the customer support dashboard at `/consult/conversations`.
