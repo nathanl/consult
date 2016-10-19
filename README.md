@@ -99,19 +99,20 @@ Wherever you'd like to display a chatbox in your template, use:
 
 ### Brunch and Assets
 
-Note: this is the part that I understand least, because Brunch. 😆 But this is what worked for me.
+Note: this is the part that I understand least, because Brunch. 😆 But I think this will work.
 
 In your Phoenix app's brunch config
 
-- Add this to your `watched` section `"../consult/web/static"`
-- To the `stylesheets.order` section, add `before: ["../consult/web/static/css/consult.css"]`
+- Add this to your `watched` section `"deps/consult/web/static"`
+- To the `stylesheets.order` section, add `before: ["deps/consult/web/static/css/consult.css"]`
 
 In your Javascript, do this:
 
 ```javascript
 import {Socket} from "phoenix"
-import "../../../../consult/web/static/js/consult.js"
-EnableConsult(Socket)
+import {Consult} from "consult"
+let consult = new Consult(Socket)
+consult.enable()
 ```
 
 ## Usage
