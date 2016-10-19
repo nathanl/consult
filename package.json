@@ -1,0 +1,21 @@
+{
+  "name": "consult",
+  "version": "0.0.1",
+  "description": "Drop-in user support chat for Elixir Phoenix apps",
+  "author": "Nathan Long <him@nathanmlong.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nathanl/consult.git"
+  },
+  "main": "./web/static/js/consult.js",
+  "files": [
+    "README.md", "package.json", "web/static/js/consult.js"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+  }
+}

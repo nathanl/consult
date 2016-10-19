@@ -72,14 +72,14 @@ Here's the simplest possible implementation:
 ```elixir
 defmodule MyApp.ConsultHooks do
 
-  def user_for_request(conn) do
+  def user_for_request(_conn) do
     # doesn't bother checking session, so
     # all chat users are anonymous
     %{id: nil, name: nil}
   end
 
   # 'user' is a return value from 'user_for_request'
-  def representative?(user) do
+  def representative?(_user) do
     # doesn't bother inspecting user, so all users
     # can see and answer incoming user chats
     # in the customer support dashboard
