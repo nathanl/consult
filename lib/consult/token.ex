@@ -36,4 +36,22 @@ defmodule Consult.Token do
     end
   end
 
+  def user_identifier(_user = %{id: id, name: name}) when is_binary(name) and is_integer(id) do
+    user_identifer_for(Integer.to_string(id), name)
+  end
+
+  def user_identifier(_user = %{id: id, name: name}) when is_binary(name) and is_binary(id) do
+    user_identifer_for(id, name)
+  end
+
+  def user_identifier(_user = %{id: id, name: name}) when is_binary(name) and is_nil(id) do
+    user_identifer_for("nil", name)
+  end
+
+  defp user_identifer_for(id, name) do
+    salt = "ilikebadgersohyes" # TODO make this the application's secret salt
+    pre_hash = [salt, id, name] |> :erlang.list_to_binary()
+    :crypto.hash(:sha256, pre_hash) |> Base.encode16
+  end
+
 end

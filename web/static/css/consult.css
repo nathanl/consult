@@ -24,6 +24,7 @@
 #chatbox #chatbox-messages {
   max-height: 12em;
   overflow-y: scroll;
+  background-color: #c1f7ff;
 }
 
 #chatbox .chatbox-label {
@@ -35,7 +36,7 @@
   white-space: pre-wrap;
 }
 
-#chatbox .chatbox-message:nth-child(odd) {
+#chatbox .chatbox-message.me {
   background-color: white;
 }
 

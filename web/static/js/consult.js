@@ -77,6 +77,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
               // TODO - ask the user for a name if none found
               chat.user_id_token         = chatSessionInfo.user_id_token
               chat.conversation_id_token = chatSessionInfo.conversation_id_token
+              chat.user_public_identifier = chatSessionInfo.user_public_identifier
 
               if (!chat.userIsCsRep) {
                 cookie.write("conversationId", chat.conversation_id_token)
@@ -89,8 +90,16 @@ let Consult = exports.Consult = function Consult(socketModule) {
               chat.socket = new socketModule("/consult_socket", {})
               chat.socket.connect()
               chat.channel = chat.socket.channel(chatSessionInfo.channel_name, {conversation_id_token: chatSessionInfo.conversation_id_token})
-              chat.channel.on("new_msg", payload => chat.addMessage(payload.timestamp, payload.from, payload.body))
-              chat.channel.on("conversation_closed", _response => { chat.disable() })
+
+              chat.channel.on("new_msg", function(payload) {
+                chat.addMessage(
+                  payload.timestamp,
+                  payload.from,
+                  payload.body,
+                  payload.user_public_identifier
+                )
+              })
+              chat.channel.on("conversation_closed", function(_response) { chat.disable() })
 
               chat.channel.join()
               .receive("ok", resp => console.log("Joined successfully", resp))
@@ -133,10 +142,12 @@ let Consult = exports.Consult = function Consult(socketModule) {
           })
         }
 
-        this.addMessage = function(timestamp, from, message) {
+        this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
           let newMessage = document.createElement("div")
           newMessage.innerHTML = `<span class="chatterbox-message-sender">${from}</span> <span class="chatterbox-message-timestamp">${timestamp}</span> <span class="chatterbox-message-contents">${message}</span>`
-          newMessage.className = "chatbox-message"
+          let isMe = this.trimmedEqual(userPublicIdentifier, chat.user_public_identifier)
+          let personTag = isMe ? "me" : null
+          newMessage.className = this.compactedString(["chatbox-message", personTag])
           chatMessages.appendChild(newMessage)
           chatMessages.scrollTop = chatMessages.scrollHeight // scroll to bottom
         }
@@ -214,10 +225,25 @@ let Consult = exports.Consult = function Consult(socketModule) {
           let oldIndex = classes.indexOf(oldClass)
           if (oldIndex !== -1) {
             classes[oldIndex] = newClass
-            element.className = classes.join(" ")
+            element.className = this.compactedString(classes)
           }
         }
 
+        this.compactedString = function(inputArray) {
+          let cleaned = []
+          for(i = 0; i < inputArray.length; i++ ) {
+            if(inputArray[i] !== null) {
+              cleaned.push(inputArray[i])
+            }
+          }
+          return cleaned.join(" ")
+        }
+
+        this.trimmedEqual = function(stringOne, stringTwo) {
+          let oneTrimmed = stringOne.trim()
+          let twoTrimmed = stringTwo.trim()
+          return oneTrimmed == twoTrimmed
+        }
       }
 
       let chat = new Chat()

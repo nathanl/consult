@@ -46,6 +46,9 @@ defmodule Consult.ChatSessionController do
       user_name: user.name || default_name,
       channel_name: "conversation:#{conversation_id}",
       conversation_id_token: Consult.Token.sign_conversation_id(conversation_id),
+      user_public_identifier: Consult.Token.user_identifier(
+        %{id: user.id, name: user.name || default_name}
+      ),
     }
   end
 

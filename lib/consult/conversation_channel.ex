@@ -21,7 +21,7 @@ defmodule Consult.ConversationChannel do
       Ecto.Query.from c in Conversation, where: c.id == ^conversation_id, preload: [messages: (^Message.reverse_sequential(Message))]
       )
     conversation.messages |> :lists.reverse |> Enum.each(fn (message) ->
-      push(socket, "new_msg", %{timestamp: Ecto.DateTime.to_string(message.inserted_at), from: message.sender_name, body: message.content})
+      push(socket, "new_msg", message_for_channel(message) )
     end)
 
     if Conversation.ended?(conversation) do
@@ -35,7 +35,7 @@ defmodule Consult.ConversationChannel do
     %Conversation{ended_at: nil} = Consult.repo.get_by!(Conversation, id: socket.assigns[:conversation_id])
     message = record_message(socket.assigns[:conversation_id], body, user_id_token, user_name)
 
-    broadcast!(socket, "new_msg", %{timestamp: Ecto.DateTime.to_string(message.inserted_at), from: user_name, body: body,  })
+    broadcast!(socket, "new_msg", message_for_channel(message))
     Consult.PanelChannel.send_update
     {:noreply, socket}
   end
@@ -45,7 +45,7 @@ defmodule Consult.ConversationChannel do
     sender_name = "System"
     message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name)
 
-    broadcast!(socket, "new_msg", %{timestamp: Ecto.DateTime.to_string(message.inserted_at), from: sender_name, body: body})
+    broadcast!(socket, "new_msg", message_for_channel(message))
     broadcast!(socket, "conversation_closed", %{})
     Consult.PanelChannel.send_update
     {:noreply, socket}
@@ -68,5 +68,19 @@ defmodule Consult.ConversationChannel do
        _ -> raise "invalid integer"
      end
   end
+
+  defp message_for_channel(message) do
+    %{
+      timestamp: Ecto.DateTime.to_string(message.inserted_at),
+      from: message.sender_name,
+      # We don't use the user_id or user_id_token for security reasons;
+      # we don't want the receiver to be able to impersonate the sender
+      user_public_identifier: Consult.Token.user_identifier(
+        %{id: message.sender_id, name: message.sender_name}
+      ),
+      body: message.content,
+    }
+  end
+
 
 end

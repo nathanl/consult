@@ -1,5 +1,6 @@
 defmodule Consult.TokenTest do
   use ExUnit.Case
+  alias Consult.Token
 
   test "signs and verifies an integer user id" do
     user_id = :rand.uniform(10_000)
@@ -41,5 +42,21 @@ defmodule Consult.TokenTest do
     assert_raise Consult.Token.InvalidConversationToken, fn ->
       Consult.Token.verify_conversation_id("a_bogus_token")
     end
+  end
+
+  test "gives a unique identifier per user" do
+    u1 = %{id: nil, name: "User"}
+    u2 = %{id: 1, name: "User"}
+    r1 = %{id: nil, name: "Rep"}
+    r2 = %{id: 2, name: "Rep"}
+    identifiers = [u1,u2,r1,r2] |> Enum.map(&Consult.Token.user_identifier/1)
+    assert Enum.uniq(identifiers) == identifiers
+  end
+
+  test "gives the same identifier every time, regardless of clock time" do
+    first = Token.user_identifier(%{id: 1, name: "Ho"})
+    :timer.sleep(1)
+    second = Token.user_identifier(%{id: 1, name: "Ho"})
+    assert first == second
   end
 end
