@@ -29,7 +29,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
   }
 
   this.enable = function() {
-    if (document.getElementById("chatbox") !== null) {
+    if (document.getElementById("consult-chatbox") !== null) {
       // TODO - do not export this!
       let Chat = exports.Chat = function Chat() {
         this.socket                = null
@@ -39,18 +39,18 @@ let Consult = exports.Consult = function Consult(socketModule) {
         this.conversation_id_token = null
         this.chatStarted           = false
 
-        this.startChatButton       = document.getElementById("chatbox-startchat")
-        this.chatBox               = document.getElementById("chatbox")
-        this.chatInput             = document.getElementById("chatbox-input")
-        let chatMessages           = document.getElementById("chatbox-messages")
-        this.closeChatButton       = document.getElementById("chatbox-close-chat")
+        this.chatBox               = document.getElementById("consult-chatbox")
+        this.chatInput             = this.chatBox.getElementsByTagName("textarea")[0]
+        this.startChatButton       = this.chatBox.getElementsByClassName("start-chat")[0]
+        let chatMessages           = this.chatBox.getElementsByClassName("messages")[0]
+        this.closeChatButton       = this.chatBox.getElementsByClassName("close-chat")[0]
 
-        this.userIsCsRep   = !!this.chatBox.className.match("cs-support")
+        this.userIsRep   = !!this.chatBox.className.match("representative")
 
         this.checkAndMaybeStart = function(){
           let inChatSession = !!cookie.read("conversationId")
 
-          if (inChatSession || this.userIsCsRep) {
+          if (inChatSession || this.userIsRep) {
             this.startChat()
           }
         }
@@ -79,7 +79,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
               chat.conversation_id_token = chatSessionInfo.conversation_id_token
               chat.user_public_identifier = chatSessionInfo.user_public_identifier
 
-              if (!chat.userIsCsRep) {
+              if (!chat.userIsRep) {
                 cookie.write("conversationId", chat.conversation_id_token)
               }
 
@@ -118,7 +118,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
 
         this.requestChatSession = function(handleSessionInfo) {
           let url = null
-          if (this.userIsCsRep) {
+          if (this.userIsRep) {
             url = `/consult/api/give_help/${this.chatBox.dataset.conversationId}`
           } else {
             let conversation_id = cookie.read("conversationId")
@@ -144,10 +144,10 @@ let Consult = exports.Consult = function Consult(socketModule) {
 
         this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
           let newMessage = document.createElement("div")
-          newMessage.innerHTML = `<span class="chatterbox-message-sender">${from}</span> <span class="chatterbox-message-timestamp">${timestamp}</span> <span class="chatterbox-message-contents">${message}</span>`
+          newMessage.innerHTML = `<span class="message-sender">${from}</span> <span class="message-timestamp">${timestamp}</span> <span class="message-contents">${message}</span>`
           let isMe = this.trimmedEqual(userPublicIdentifier, chat.user_public_identifier)
-          let personTag = isMe ? "me" : null
-          newMessage.className = this.compactedString(["chatbox-message", personTag])
+          let personTag = isMe ? "mine" : null
+          newMessage.className = this.compactedString(["message", personTag])
           chatMessages.appendChild(newMessage)
           chatMessages.scrollTop = chatMessages.scrollHeight // scroll to bottom
         }
@@ -193,7 +193,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
                 ended_by: this.user_name,
                 user_id_token: this.user_id_token,
               })
-              if (!this.userIsCsRep) {
+              if (!this.userIsRep) {
                 this.reset()
               }
             }
@@ -205,7 +205,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
           // depending on which party hangs up
           this.swapClass(this.chatBox, "active", "ended")
           chat.socket.disconnect()
-          if (this.userIsCsRep) {
+          if (this.userIsRep) {
             this.closeChatButton.parentNode.removeChild(this.closeChatButton)
           }
         }
@@ -250,7 +250,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
       chat.checkAndMaybeStart()
     }
 
-    if (document.getElementById("chatterbox-dashboard") !== null) {
+    if (document.getElementById("consult-dashboard") !== null) {
       let main = document.getElementById("main")
 
       let socket = new socketModule("/consult_socket", {})

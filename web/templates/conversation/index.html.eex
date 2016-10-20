@@ -1,6 +1,6 @@
 <h1>Conversations</h1>
 
-<div id="chatterbox-dashboard">
+<div id="consult-dashboard">
   <%= Enum.map(@conversations, fn ({category, conversations}) -> %>
     <div class="conversation-category">
       <h2><%= category %></h2>

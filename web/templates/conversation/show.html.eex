@@ -14,4 +14,4 @@
   <% end %>
 <% end %>
 
-<%= render Consult.ChatboxView, "_chatbox.html", chatbox_class: "cs-support#{if @ended, do: " ended"}", conversation_id: @id, ended: @ended %>
+<%= render Consult.ChatboxView, "_chatbox.html", chatbox_class: "representative#{if @ended, do: " ended"}", conversation_id: @id, ended: @ended %>

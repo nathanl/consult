@@ -1,4 +1,4 @@
-#chatbox {
+#consult-chatbox {
   padding: 0.5em;
   border: 1px solid black;
   background-color: #ddd;
@@ -8,81 +8,84 @@
   width: 40%;
 }
 
-#chatbox textarea {
+#consult-chatbox textarea {
   width: 80%;
 }
 
-#chatbox.cs-support {
+#consult-chatbox.representative {
   position: relative;
   width: 100%;
 }
 
-#chatbox .widget {
+#consult-chatbox .widget {
   padding: 1em;
 }
 
-#chatbox #chatbox-messages {
+#consult-chatbox .messages {
   max-height: 12em;
   overflow-y: scroll;
   background-color: #c1f7ff;
 }
 
-#chatbox .chatbox-label {
+#consult-chatbox .chatbox-label {
   color: green;
   position: relative;
 }
 
-#chatbox .chatbox-message {
+#consult-chatbox .message {
   white-space: pre-wrap;
 }
 
-#chatbox .chatbox-message.me {
+#consult-chatbox .message.mine {
   background-color: white;
 }
 
-#chatbox .chatterbox-message-sender {
+#consult-chatbox .message-sender {
   font-weight: bold;
 }
 
-#chatbox .chatterbox-message-timestamp {
+#consult-chatbox .message-timestamp {
   font-size: 0.75em;
   font-style: italic;
 }
 
-#chatbox .chatterbox-message-contents {
+#consult-chatbox .message-contents {
   display: block;
 }
 
-#chatbox .chatbox-error {
+#consult-chatbox .chatbox-error {
   color: red;
 }
 
-#chatbox button#chatbox-close-chat {
+#consult-chatbox button.close-chat {
   background-color: red;
   color: white;
   margin-left: 10px;
 }
 
-#chatbox .state                   { display: none; }
-#chatbox.inactive .inactive.state { display: block; }
-#chatbox.loading  .loading.state  { display: block; }
-#chatbox.active   .active.state   { display: block; }
-#chatbox.ended    .active.state   { display: block; opacity: 0.8; }
-#chatbox.ended    #chatbox-input  { display: none; }
+#consult-chatbox button.close-chat:before {
+  content: "✗"
+}
 
-#chatbox.inactive { background: none; border: none; }
-#chatbox.inactive button#chatbox-startchat { background: #eef; border: none; }
-#chatbox.inactive button#chatbox-startchat { font-size: 3em; }
-#chatbox.inactive button#chatbox-startchat:before { content: "💬" }
+#consult-chatbox .state                   { display: none; }
+#consult-chatbox.inactive .inactive.state { display: block; }
+#consult-chatbox.loading  .loading.state  { display: block; }
+#consult-chatbox.active   .active.state   { display: block; }
+#consult-chatbox.ended    .active.state   { display: block; opacity: 0.8; }
+#consult-chatbox.ended    textarea  { display: none; }
 
-#chatbox .loading.state { padding: 1.5em; font-size: 1.5em;}
+#consult-chatbox.inactive { background: none; border: none; }
+#consult-chatbox.inactive button.start-chat { background: #eef; border: none; }
+#consult-chatbox.inactive button.start-chat { font-size: 3em; }
+#consult-chatbox.inactive button.start-chat:before { content: "💬" }
 
-#chatterbox-dashboard .conversation-tag {
+#consult-chatbox .loading.state { padding: 1.5em; font-size: 1.5em;}
+
+#consult-dashboard .conversation-tag {
   background-color: #ccc;
   border: 1px solid black;
   border-radius: 10%;
   padding: 0 0.3em;
 }
 
-#chatterbox-dashboard .conversation-tag.bug { background-color: #f44; }
-#chatterbox-dashboard .user-name { font-weight: bold; }
+#consult-dashboard .user-name { font-weight: bold; }
