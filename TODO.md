@@ -5,13 +5,13 @@
 - Clean up query stuff for conversations
 - Let user download the chat history
 - Let CS rep add notes to a conversation
-- Label each message with some kind of per-user id so that we can style each speaker's differently - styles for 'me' and 'not me' is probably enough.
 - Add "is typing" indicators for users who are not self, maybe 'multiple users are typing' if more than 2.
 - Populate only the most recent N messages in a conversation when backfilling history, and load more as the user scrolls up
   - With this, we can then have some infinite conversations (don't allow closing) for back-channel talk between cs reps ("I need some help here", etc)
   - *Maybe* use "who is in the lounge channel" to decide whether any cs reps are available to chat? We need a conditional for that in the views to show the chat feature...
 - Use gettext to let app customize the text?
 - Let app customize the way timestamps are displayed?
+- Socket assigns are unique per user; use that to save user name, etc on join and not require them for new_msg
 - Clean up path references
 - In setup:
   - Prompt user for name if not logged in (currently using "Anonymous")
