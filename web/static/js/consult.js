@@ -184,21 +184,19 @@ let Consult = exports.Consult = function Consult(socketModule) {
 
         this.closeChat = function() {
           // TODO - don't send this request if we know the conversation is already closed
+          // TODO - why is it possible for this to bleed across conversations
+          // - shouldn't each one have a different topic?
           this.onAjaxSuccess(
             "PUT",
             `/consult/api/close_conversation/${this.conversation_id_token}`, (chatSessionInfo) => {
-              cookie.erase("conversationId")
-              this.chatSessionCleared = true
               this.channel.push("conversation_closed", {
                 ended_at: chatSessionInfo.ended_at,
                 ended_by: this.user_name,
                 user_id_token: this.user_id_token,
               })
-              if (!this.userIsRep) {
-                this.reset()
-              }
             }
           )
+          if (!this.userIsRep) { this.reset() }
         }
 
         this.disable = function() {
@@ -209,6 +207,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.reset = function() {
+          cookie.erase("conversationId")
           chatMessages.innerHTML = ""
           this.chatBox.className = "inactive"
           this.chatStarted = false
