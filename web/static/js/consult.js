@@ -30,8 +30,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
 
   this.enable = function() {
     if (document.getElementById("consult-chatbox") !== null) {
-      // TODO - do not export this!
-      let Chat = exports.Chat = function Chat() {
+      let Chat = function Chat() {
         this.socket                = null
         this.channel_name          = null
         this.user_name             = null
