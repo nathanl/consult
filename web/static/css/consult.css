@@ -73,6 +73,7 @@
 #consult-chatbox.active   .active.state   { display: block; }
 #consult-chatbox.ended    .active.state   { display: block; opacity: 0.8; }
 #consult-chatbox.ended    textarea  { display: none; }
+#consult-chatbox.ended.representative button.close-chat { display: none; }
 
 #consult-chatbox.inactive { background: none; border: none; }
 #consult-chatbox.inactive button.start-chat { background: #eef; border: none; }

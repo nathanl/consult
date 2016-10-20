@@ -205,9 +205,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
           // depending on which party hangs up
           this.swapClass(this.chatBox, "active", "ended")
           chat.socket.disconnect()
-          if (this.userIsRep) {
-            this.closeChatButton.parentNode.removeChild(this.closeChatButton)
-          }
         }
 
         this.reset = function() {
