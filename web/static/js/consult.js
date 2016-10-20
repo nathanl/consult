@@ -63,6 +63,22 @@ let Consult = exports.Consult = function Consult(socketModule) {
           chat.closeChat()
         })
 
+        this.chatInput.addEventListener("keypress", event => {
+          let enterKeyCode = 13
+          if(event.keyCode === enterKeyCode && !event.shiftKey) {
+            let message = this.chatInput.value.trim()
+            if (!this.isBlank(message)) {
+              this.channel.push("new_msg", {
+                body: message,
+                user_name: this.user_name,
+                user_id_token: this.user_id_token,
+              })
+              this.chatInput.value = ""
+            }
+            event.preventDefault() // don't insert a new line
+          }
+        })
+
         this.startChat = function(){
           if (this.chatStarted) { return false }
           chat.chatStarted = true
@@ -103,14 +119,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
               chat.channel.join()
               .receive("ok", resp => console.log("Joined successfully", resp))
               .receive("error", resp => console.log("Unable to join", resp))
-
-              chat.onSubmit( (body, user_name, user_id_token) => {
-                chat.channel.push("new_msg", {
-                  body: body,
-                  user_name: user_name,
-                  user_id_token: user_id_token,
-                })
-              })
             }
           )
         }
@@ -124,21 +132,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
             url = `/consult/api/get_help?conversation_id_token=${conversation_id}`
           }
           this.onAjaxSuccess("GET", url, handleSessionInfo)
-        }
-
-        this.onSubmit = function(submitHandler) {
-          let enterKeyCode = 13
-          this.chatInput.addEventListener("keypress", event => {
-            if(event.keyCode === enterKeyCode && !event.shiftKey) {
-              let message = this.chatInput.value.trim()
-              if (!this.isBlank(message)) {
-
-                submitHandler(message, this.user_name, this.user_id_token)
-                this.chatInput.value = ""
-              }
-              event.preventDefault() // don't insert a new line
-            }
-          })
         }
 
         this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
