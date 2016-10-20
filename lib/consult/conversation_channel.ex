@@ -40,8 +40,16 @@ defmodule Consult.ConversationChannel do
     {:noreply, socket}
   end
 
-  def handle_in("conversation_closed", %{"ended_by" => ended_by, "user_id_token" => user_id_token, "ended_at" => ended_at}, socket) do
-    body = "[Conversation ended by #{ended_by} at #{ended_at}]"
+  def handle_in("conversation_closed", %{"ended_by" => ended_by, "user_id_token" => user_id_token}, socket) do
+    closed = close_conversation(socket.assigns[:conversation_id])
+    body = [
+      "(Conversation ended by",
+      ended_by,
+      "at",
+      Ecto.DateTime.to_string(closed.ended_at),
+      ")",
+    ] |> Enum.join(" ")
+
     sender_name = "System"
     message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name)
 
@@ -59,6 +67,14 @@ defmodule Consult.ConversationChannel do
       |> Message.changeset
       {:ok, message} = Consult.repo.insert(new_message)
       message
+  end
+
+  defp close_conversation(convo_id) do
+    with conversation <- Consult.repo.get_by(Conversation, id: convo_id),
+    %Conversation{} <- conversation do
+      {:ok, conversation} = (Conversation.end_now(conversation) |> Consult.repo.update)
+      conversation
+    end
   end
 
   defp ensure_integer(n) when is_integer(n), do: n

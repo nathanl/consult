@@ -20,19 +20,6 @@ defmodule Consult.ChatSessionController do
     send_json_response(conn, chat_session_info(conn, "User", conversation_id))
   end
 
-  def close_conversation(conn, %{"conversation_id_token" => conversation_id_token}) do
-    closed_conversation = with convo_id <- Consult.Token.verify_conversation_id(conversation_id_token),
-    conversation <- Consult.repo.get_by(Conversation, id: convo_id),
-    %Conversation{} <- conversation do
-      {:ok, conversation} = Conversation.end_now(conversation) |> Consult.repo.update
-      conversation
-    end
-
-    render_data = %{ended_at: Ecto.DateTime.to_string(closed_conversation.ended_at)}
-
-    send_json_response(conn, render_data)
-  end
-
   defp send_json_response(conn, render_data) do
     conn
     |> put_resp_content_type("application/json")

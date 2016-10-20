@@ -99,7 +99,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
                   payload.user_public_identifier
                 )
               })
-              chat.channel.on("conversation_closed", function(_response) { chat.disable() })
+              chat.channel.on("conversation_closed", function(_response) { chat.reactToChatClosing() })
 
               chat.channel.join()
               .receive("ok", resp => console.log("Joined successfully", resp))
@@ -183,34 +183,36 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.closeChat = function() {
-          // TODO - don't send this request if we know the conversation is already closed
-          // TODO - why is it possible for this to bleed across conversations
-          // - shouldn't each one have a different topic?
-          this.onAjaxSuccess(
-            "PUT",
-            `/consult/api/close_conversation/${this.conversation_id_token}`, (chatSessionInfo) => {
-              this.channel.push("conversation_closed", {
-                ended_at: chatSessionInfo.ended_at,
-                ended_by: this.user_name,
-                user_id_token: this.user_id_token,
-              })
-            }
-          )
-          if (!this.userIsRep) { this.reset() }
+          this.channel.push("conversation_closed", {
+            ended_by: this.user_name,
+            user_id_token: this.user_id_token,
+          })
+          if (this.userIsRep) {
+            // Don't disconnect yet. Wait for notification, and in the
+            // meantime, display the "conversation closed" message
+            // that will bounce back
+            this.disableChat()
+          } else {
+            this.chatStarted = false
+            chat.socket.disconnect()
+            this.resetChat()
+          }
         }
 
-        this.disable = function() {
-          // may happen after reset or before,
-          // depending on which party hangs up
-          this.swapClass(this.chatBox, "active", "ended")
+        this.reactToChatClosing = function() {
           chat.socket.disconnect()
+          this.chatStarted = false
+          this.disableChat()
         }
 
-        this.reset = function() {
+        this.disableChat = function() {
+          this.swapClass(this.chatBox, "active", "ended")
+        }
+
+        this.resetChat = function() {
           cookie.erase("conversationId")
           chatMessages.innerHTML = ""
           this.chatBox.className = "inactive"
-          this.chatStarted = false
         }
 
         this.isBlank = function(string) {
