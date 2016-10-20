@@ -60,6 +60,10 @@ let Consult = exports.Consult = function Consult(socketModule) {
           this.startChat()
         })
 
+        this.closeChatButton.addEventListener("click", event => {
+          chat.closeChat()
+        })
+
         this.startChat = function(){
           if (this.chatStarted) { return false }
           chat.chatStarted = true
@@ -82,10 +86,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
               if (!chat.userIsRep) {
                 cookie.write("conversationId", chat.conversation_id_token)
               }
-
-              chat.closeChatButton.addEventListener("click", event => {
-                chat.closeChat()
-              })
 
               chat.socket = new socketModule("/consult_socket", {})
               chat.socket.connect()
@@ -143,6 +143,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
+          if (!this.chatStarted) { return }
           let newMessage = document.createElement("div")
           newMessage.innerHTML = `<span class="message-sender">${from}</span> <span class="message-timestamp">${timestamp}</span> <span class="message-contents">${message}</span>`
           let isMe = this.trimmedEqual(userPublicIdentifier, chat.user_public_identifier)
