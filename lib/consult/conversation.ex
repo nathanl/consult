@@ -77,6 +77,59 @@ defmodule Consult.Conversation do
       }
     end
 
+    # grab info about the first and last message in this conversation,
+    # from a user with this role
+    def with_messages_snapshot_from_role(query, role) do
+      from conv in query,
+      left_join: last_message_from_role in fragment(
+      """
+      (
+        SELECT conversation_id,
+        first_value(inserted_at) OVER w AS first_message_time,
+        last_value(inserted_at)  OVER w AS last_message_time,
+        first_value(content)     OVER w AS first_message_content,
+        last_value(content)      OVER w AS last_message_content
+        FROM consult_messages cm
+        WHERE cm.sender_role = ? 
+        WINDOW w AS (
+          PARTITION BY conversation_id
+          ORDER BY id ASC
+        )
+      )
+      """,
+      ^role),
+      on: last_message_from_role.conversation_id == conv.id
+    end
+
+    def select_stuff(query) do
+      from [conv, messages_snapshot] in query,
+      select: %{
+        id: conv.id,
+        first_inserted: messages_snapshot.first_message_time,
+        last_inserted: messages_snapshot.last_message_time,
+        first_content: messages_snapshot.first_message_content,
+        last_content: messages_snapshot.last_message_content,
+      }
+    end
+# SELECT  
+#     cstamp,
+#     price,
+#     date_trunc('hour',cstamp) AS h,
+#     floor(EXTRACT(minute FROM cstamp) / 5) AS m5,
+#     min(price) OVER w,
+#     max(price) OVER w,
+#     first_value(price) OVER w,
+#     last_value(price) OVER w
+# FROM trades
+# Where date_trunc('hour',cstamp) = timestamp '2013-03-29 09:00:00'
+# WINDOW w AS (
+#     PARTITION BY date_trunc('hour',cstamp) , floor(extract(minute FROM cstamp) / 5)
+#     ORDER BY cstamp
+#     range between unbounded preceding and unbounded following
+#     )
+# ORDER BY cstamp;
+
+
     def with_last_message_time_from_role(query, role) do
       from conv in query,
       left_join: last_message_from_role in fragment(

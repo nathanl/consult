@@ -13,4 +13,16 @@ defmodule Consult.ConversationTest do
     end
   end
 
+  test "how do these queries work" do
+    TestApp.Repo.insert!(Fixtures.ended_conversation)
+    results = Conversation
+    |> Conversation.Scopes.with_messages_snapshot_from_role("user")
+    |> Conversation.Scopes.select_stuff
+    
+    # results = Ecto.Adapters.SQL.to_sql(:all, Consult.repo, results)
+    |> Consult.repo.all
+
+    IO.inspect results
+  end
+
 end
