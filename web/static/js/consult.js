@@ -69,7 +69,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         })
 
         this.startChat = function(){
-          if (this.socket) { return false }
+          if (this.connectionIsOpen()) { return false }
           chat.swapClass(this.chatBox, "inactive", "loading")
           chat.requestChatSession(
             function(chatSessionInfo){
@@ -84,32 +84,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
                 cookie.write("conversationIdToken", chatSessionInfo.conversation_id_token)
               }
 
-              chat.socket = new socketModule("/consult_socket", {})
-              chat.socket.connect()
-              chat.channel = chat.socket.channel(
-                chatSessionInfo.channel_name,
-                {
-                  conversation_id_token: chatSessionInfo.conversation_id_token,
-                  user_role_token: chatSessionInfo.user_role_token,
-                  // TODO - ask the user for a name if none found
-                  user_name: chatSessionInfo.user_name,
-                  user_id_token: chatSessionInfo.user_id_token,
-                }
-              )
-
-              chat.channel.on("new_msg", function(payload) {
-                chat.addMessage(
-                  payload.timestamp,
-                  payload.from,
-                  payload.body,
-                  payload.user_public_identifier
-                )
-              })
-              chat.channel.on("conversation_closed", function(_response) { chat.reactToChatClosing() })
-
-              chat.channel.join()
-              .receive("ok", resp => console.log("Joined successfully", resp))
-              .receive("error", resp => console.log("Unable to join", resp))
+              chat.openConnection(chatSessionInfo)
             }
           )
         }
@@ -166,7 +141,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.closeChat = function() {
-          if (this.channel) {
+          if (this.connectionIsOpen()) {
             this.channel.push("conversation_closed", {})
           }
           if (this.userIsRep) {
@@ -179,12 +154,42 @@ let Consult = exports.Consult = function Consult(socketModule) {
           }
         }
 
+        this.openConnection = function(chatSessionInfo) {
+          chat.socket = new socketModule("/consult_socket", {})
+          chat.socket.connect()
+          chat.channel = chat.socket.channel(
+            chatSessionInfo.channel_name,
+            {
+              conversation_id_token: chatSessionInfo.conversation_id_token,
+              user_role_token: chatSessionInfo.user_role_token,
+              // TODO - ask the user for a name if none found
+              user_name: chatSessionInfo.user_name,
+              user_id_token: chatSessionInfo.user_id_token,
+            }
+          )
+          chat.channel.on("new_msg", function(payload) {
+            chat.addMessage(
+              payload.timestamp,
+              payload.from,
+              payload.body,
+              payload.user_public_identifier
+            )
+          })
+          chat.channel.on("conversation_closed", function(_response) { chat.reactToChatClosing() })
+
+          chat.channel.join()
+          .receive("ok", resp => console.log("Joined successfully", resp))
+          .receive("error", resp => console.log("Unable to join", resp))
+        }
+
+        this.connectionIsOpen = function() {
+          return !!(this.socket && this.channel)
+        }
+
         this.closeConnection = function() {
-          if (this.socket) {
-            this.socket.disconnect()
-            this.socket = null
-            this.channel = null
-          }
+          if (this.socket) { this.socket.disconnect() }
+          this.socket = null
+          this.channel = null
         }
 
         this.reactToChatClosing = function() {
