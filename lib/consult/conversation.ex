@@ -84,7 +84,9 @@ defmodule Consult.Conversation do
       left_join: last_message_from_role in fragment(
       """
       (
-        SELECT conversation_id,
+        SELECT
+        conversation_id,
+        row_number()             OVER w AS row,
         first_value(inserted_at) OVER w AS first_message_time,
         last_value(inserted_at)  OVER w AS last_message_time,
         first_value(content)     OVER w AS first_message_content,
@@ -105,6 +107,7 @@ defmodule Consult.Conversation do
       from [conv, messages_snapshot] in query,
       select: %{
         id: conv.id,
+        row: messages_snapshot.row,
         first_inserted: messages_snapshot.first_message_time,
         last_inserted: messages_snapshot.last_message_time,
         first_content: messages_snapshot.first_message_content,
