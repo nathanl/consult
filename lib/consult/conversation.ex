@@ -61,29 +61,22 @@ defmodule Consult.Conversation do
       """
       ),
       on: (messages.conversation_id == conv.id and messages.row == 1),
-      # TODO - find some way to make separate scopes for "1 participant" and
-      # "more than one", for answered vs unanswered chats
-      left_join: participants in fragment(
+      left_join: last_representative_message in fragment(
       """
-      (SELECT
-      conversation_id,
-      -- Assume every participant has a distinct combination of
-      -- sender_id and sender_name and count them.
-      -- If user and rep both have no id and are both named 'Alex',
-      -- that will be a weird edge case and we'll think there's only
-      -- one participant.
-      COUNT(DISTINCT CONCAT(COALESCE(sender_id, '0'), COALESCE(sender_name, 'NONE'))) AS participant_count
-      FROM consult_messages
-      GROUP BY conversation_id
+      (
+        SELECT MAX(cm.inserted_at) AS last_rep_message_at, cm.conversation_id
+        FROM consult_messages AS cm
+        WHERE cm.sender_role = 'representative'
+        GROUP BY conversation_id
       )
       """
-      ), on: participants.conversation_id == conv.id,
+      ), on: last_representative_message.conversation_id == conv.id,
       left_join: tags in assoc(conv, :tags),
       preload: [tags: tags],
       select: %{
         conv: conv,
         id: conv.id,
-        participant_count: participants.participant_count,
+        last_representative_message: last_representative_message.last_rep_message_at,
         tags: [tags],
         first_message: %{
           sender_name: messages.sender_name,
@@ -99,15 +92,13 @@ defmodule Consult.Conversation do
   # TODO find way to make these part of query
     def unanswered(conversations) do
       conversations |> Enum.filter(fn (conversation) ->
-        conversation.participant_count == 1
+        is_nil(conversation.last_representative_message)
       end)
     end
 
     def ongoing(conversations) do
       conversations |> Enum.filter(fn (conversation) ->
-        # If there are no messages, participant_count will come back
-        # nil from the query
-        (conversation.participant_count || 0) > 1
+        !is_nil(conversation.last_representative_message)
       end)
     end
   end
