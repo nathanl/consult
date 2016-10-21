@@ -87,16 +87,16 @@ defmodule Consult.Conversation do
 
     def with_last_message_time_from_role(query, role) do
       from conv in query,
-      left_join: last_representative_message in fragment(
+      left_join: last_message_from_role in fragment(
       """
       (
         SELECT MAX(cm.inserted_at) AS last_rep_message_at, cm.conversation_id
         FROM consult_messages AS cm
-        WHERE cm.sender_role = 'representative'
+        WHERE cm.sender_role = ?
         GROUP BY conversation_id
       )
-      """
-      ), on: last_representative_message.conversation_id == conv.id
+      """, ^role),
+      on: last_message_from_role.conversation_id == conv.id
     end
 
     def select_stuff(query) do
