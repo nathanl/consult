@@ -8,6 +8,7 @@ defmodule Consult.Message do
     field :content, :string # limit to ~3k?
     field :sender_name, :string
     field :sender_id, :string
+    field :sender_role, :string
 
     timestamps
   end

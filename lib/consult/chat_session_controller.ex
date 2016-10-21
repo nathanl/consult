@@ -9,15 +9,18 @@ defmodule Consult.ChatSessionController do
     render_data = case conversation do
       nil -> %{error: "The requested conversation does not exist"}
       %Conversation{} ->
-        chat_session_info(conn, "Representative", conversation_id)
+        chat_session_info(conn, "representative", conversation_id)
     end
 
     send_json_response(conn, render_data)
   end
 
+  # TODO have separate function head for null vs not null token
   def get_help(conn, %{"conversation_id_token" => conversation_id_token}) do
     conversation_id = Consult.ConversationSource.id_for(conversation_id_token)
-    send_json_response(conn, chat_session_info(conn, "User", conversation_id))
+    send_json_response(
+      conn, chat_session_info(conn, "user", conversation_id)
+    )
   end
 
   defp send_json_response(conn, render_data) do
@@ -26,17 +29,22 @@ defmodule Consult.ChatSessionController do
     |> send_resp(200, Poison.encode!(render_data))
   end
 
-  defp chat_session_info(conn, default_name, conversation_id) do
+  defp chat_session_info(conn, user_role, conversation_id) do
     user = Consult.hooks_module.user_for_request(conn)
+    user_name = user.name || default_user_name(user_role)
     %{
       user_id_token: Consult.Token.sign_user_id(user.id),
-      user_name: user.name || default_name,
+      user_role_token: Consult.Token.sign_user_role(user_role),
+      user_name: user_name,
       channel_name: "conversation:#{conversation_id}",
       conversation_id_token: Consult.Token.sign_conversation_id(conversation_id),
       user_public_identifier: Consult.Token.user_identifier(
-        %{id: user.id, name: user.name || default_name}
+        %{id: user.id, name: user_name}
       ),
     }
   end
+
+  def default_user_name(_role = "user"), do: "User"
+  def default_user_name(_role = "representative"), do: "Representative"
 
 end

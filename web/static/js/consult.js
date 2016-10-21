@@ -104,7 +104,13 @@ let Consult = exports.Consult = function Consult(socketModule) {
 
               chat.socket = new socketModule("/consult_socket", {})
               chat.socket.connect()
-              chat.channel = chat.socket.channel(chatSessionInfo.channel_name, {conversation_id_token: chatSessionInfo.conversation_id_token})
+              chat.channel = chat.socket.channel(
+                chatSessionInfo.channel_name,
+                {
+                  conversation_id_token: chatSessionInfo.conversation_id_token,
+                  user_role_token: chatSessionInfo.user_role_token,
+                }
+              )
 
               chat.channel.on("new_msg", function(payload) {
                 chat.addMessage(

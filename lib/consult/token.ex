@@ -8,6 +8,10 @@ defmodule Consult.Token do
     defexception message: "is not valid"
   end
 
+  defmodule InvalidUserRoleToken do
+    defexception message: "is not valid"
+  end
+
   def sign_user_id(user_id) do
     Phoenix.Token.sign(Consult.endpoint, "user_id", user_id)
   end
@@ -33,6 +37,19 @@ defmodule Consult.Token do
     ) do
       {:ok, conversation_id} -> conversation_id
       _ -> raise InvalidConversationToken, message: conversation_id_token
+    end
+  end
+
+  def sign_user_role(role_name) do
+    Phoenix.Token.sign(Consult.endpoint, "user_role", role_name)
+  end
+
+  def verify_user_role(user_role_token) do
+    case Phoenix.Token.verify(
+      Consult.endpoint, "user_role", user_role_token
+    ) do
+      {:ok, role_name} -> role_name
+      _ -> raise InvalidUserRoleToken, message: user_role_token
     end
   end
 

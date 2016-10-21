@@ -38,9 +38,22 @@ defmodule Consult.TokenTest do
     end
   end
 
-  test "gives a helpful error if the conversation token is invalid" do
+  test "gives a meaningful error if the conversation token is invalid" do
     assert_raise Consult.Token.InvalidConversationToken, fn ->
       Consult.Token.verify_conversation_id("a_bogus_token")
+    end
+  end
+
+  test "signs and verifies a user role" do
+    role_name = "representative"
+    signed = Consult.Token.sign_user_role(role_name)
+    verified = Consult.Token.verify_user_role(signed)
+    assert verified == role_name
+  end
+
+  test "gives a meaningful error if the user role token is invalid" do
+    assert_raise Consult.Token.InvalidUserRoleToken, fn ->
+      Consult.Token.verify_user_role("a_bogus_role_token")
     end
   end
 

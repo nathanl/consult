@@ -3,13 +3,16 @@ defmodule Consult.ConversationChannel do
   alias Consult.{Conversation,Message}
   require Ecto.Query
 
-  def join("conversation:" <> requested_id, %{"conversation_id_token" => conversation_id_token}, socket) do
+  def join("conversation:" <> requested_id, %{"conversation_id_token" => conversation_id_token, "user_role_token" => user_role_token}, socket) do
     authorized_id = Consult.Token.verify_conversation_id(conversation_id_token)
     [requested_id, authorized_id] = Enum.map([requested_id, authorized_id], &ensure_integer/1)
     
     if requested_id == authorized_id do
+      authorized_role = Consult.Token.verify_user_role(user_role_token)
       send(self, {:after_join, authorized_id})
-      socket = assign(socket, :conversation_id, authorized_id)
+      socket = socket
+      |> assign(:conversation_id, authorized_id)
+      |> assign(:user_role, authorized_role)
       {:ok, socket}
     else
       {:error, "Not authorized to join this conversation"}
@@ -33,7 +36,7 @@ defmodule Consult.ConversationChannel do
 
   def handle_in("new_msg", %{"body" => body, "user_name" => user_name, "user_id_token" => user_id_token}, socket) do
     %Conversation{ended_at: nil} = Consult.repo.get_by!(Conversation, id: socket.assigns[:conversation_id])
-    message = record_message(socket.assigns[:conversation_id], body, user_id_token, user_name)
+    message = record_message(socket.assigns[:conversation_id], body, user_id_token, user_name, socket.assigns[:user_role])
 
     broadcast!(socket, "new_msg", message_for_channel(message))
     Consult.PanelChannel.send_update
@@ -51,7 +54,7 @@ defmodule Consult.ConversationChannel do
     ] |> Enum.join(" ")
 
     sender_name = "System"
-    message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name)
+    message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name, "system")
 
     broadcast!(socket, "new_msg", message_for_channel(message))
     broadcast!(socket, "conversation_closed", %{})
@@ -59,11 +62,11 @@ defmodule Consult.ConversationChannel do
     {:noreply, socket}
   end
 
-  defp record_message(conversation_id, content, user_id_token, sender_name) do
-    user_id = Consult.Token.verify_user_id(user_id_token)
+  defp record_message(conversation_id, content, user_id_token, sender_name, sender_role) do
+    sender_id = Consult.Token.verify_user_id(user_id_token)
 
     new_message =
-      %Message{content: content, conversation_id: conversation_id, sender_name: sender_name, sender_id: user_id}
+      %Message{content: content, conversation_id: conversation_id, sender_name: sender_name, sender_id: sender_id, sender_role: sender_role}
       |> Message.changeset
       {:ok, message} = Consult.repo.insert(new_message)
       message

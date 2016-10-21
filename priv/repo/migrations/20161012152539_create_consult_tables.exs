@@ -12,6 +12,7 @@ defmodule TestApp.Repo.Migrations.CreateConsultTables do
       add :content, :text, null: false
       add :sender_name, :string, null: false
       add :sender_id, :string
+      add :sender_role, :string, null: false
 
       timestamps
     end
