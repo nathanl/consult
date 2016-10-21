@@ -13,28 +13,20 @@ defmodule Consult.ConversationSummary do
 
   def conversations do
     query = Conversation |> Scopes.id_and_message_info
+    not_ended = not_ended(query)
 
     [
-      {"Unanswered", unanswered_conversations(query)},
-      {"Ongoing", ongoing_conversations(query)},
+      {"Unanswered", (not_ended |> Filters.unanswered)},
+      {"Ongoing", (not_ended |> Filters.ongoing)},
       {"Ended", ended_conversations(query)},
     ]
   end
 
-  defp unanswered_conversations(query) do
+  def not_ended(query) do
     query
     |> Scopes.not_ended
     |> Scopes.sequential
     |> Consult.repo.all
-    |> Filters.unanswered
-  end
-
-  defp ongoing_conversations(query) do
-    query
-    |> Scopes.not_ended
-    |> Scopes.sequential
-    |> Consult.repo.all
-    |> Filters.ongoing
   end
 
   defp ended_conversations(query) do

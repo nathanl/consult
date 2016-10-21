@@ -25,4 +25,10 @@ defmodule Consult.ConversationSummaryTest do
     assert Enum.count(ongoing    ) == 1
   end
 
+  test "gets conversations with all their tags" do
+    TestApp.Repo.insert!(Fixtures.conversation_with_tags(["bug", "bad"]))
+    [{_, [new_unanswered | _]}, _, _] = Summary.conversations
+    assert Enum.map(new_unanswered.tags, fn (tag) -> tag.name end) == ["bug", "bad"]
+  end
+
 end
