@@ -31,13 +31,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
   this.enable = function() {
     if (document.getElementById("consult-chatbox") !== null) {
       let Chat = function Chat() {
-        this.socket                = null
-        this.channel_name          = null
-        this.user_name             = null
-        this.user_id_token         = null
-        this.conversation_id_token = null
-        this.chatStarted           = false
-
         this.chatBox               = document.getElementById("consult-chatbox")
         this.chatInput             = this.chatBox.getElementsByTagName("textarea")[0]
         this.startChatButton       = this.chatBox.getElementsByClassName("start-chat")[0]
@@ -47,7 +40,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         this.userIsRep   = !!this.chatBox.className.match("representative")
 
         this.checkAndMaybeStart = function(){
-          let inChatSession = !!cookie.read("conversationId")
+          let inChatSession = !!cookie.read("conversationIdToken")
 
           if (inChatSession || this.userIsRep) {
             this.startChat()
@@ -68,11 +61,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
           if(event.keyCode === enterKeyCode && !event.shiftKey) {
             let message = this.chatInput.value.trim()
             if (!this.isBlank(message)) {
-              this.channel.push("new_msg", {
-                body: message,
-                user_name: this.user_name,
-                user_id_token: this.user_id_token,
-              })
+              this.channel.push("new_msg", { body: message })
               this.chatInput.value = ""
             }
             event.preventDefault() // don't insert a new line
@@ -80,8 +69,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
         })
 
         this.startChat = function(){
-          if (this.chatStarted) { return false }
-          chat.chatStarted = true
+          if (this.socket) { return false }
           chat.swapClass(this.chatBox, "inactive", "loading")
           chat.requestChatSession(
             function(chatSessionInfo){
@@ -90,16 +78,10 @@ let Consult = exports.Consult = function Consult(socketModule) {
                 return false
               }
               chat.swapClass(chat.chatBox, "loading", "active")
-
-              chat.channel_name          = chatSessionInfo.channel_name
-              chat.user_name             = chatSessionInfo.user_name
-              // TODO - ask the user for a name if none found
-              chat.user_id_token         = chatSessionInfo.user_id_token
-              chat.conversation_id_token = chatSessionInfo.conversation_id_token
               chat.user_public_identifier = chatSessionInfo.user_public_identifier
 
               if (!chat.userIsRep) {
-                cookie.write("conversationId", chat.conversation_id_token)
+                cookie.write("conversationIdToken", chatSessionInfo.conversation_id_token)
               }
 
               chat.socket = new socketModule("/consult_socket", {})
@@ -109,6 +91,9 @@ let Consult = exports.Consult = function Consult(socketModule) {
                 {
                   conversation_id_token: chatSessionInfo.conversation_id_token,
                   user_role_token: chatSessionInfo.user_role_token,
+                  // TODO - ask the user for a name if none found
+                  user_name: chatSessionInfo.user_name,
+                  user_id_token: chatSessionInfo.user_id_token,
                 }
               )
 
@@ -134,14 +119,14 @@ let Consult = exports.Consult = function Consult(socketModule) {
           if (this.userIsRep) {
             url = `/consult/api/give_help/${this.chatBox.dataset.conversationId}`
           } else {
-            let conversation_id = cookie.read("conversationId")
+            let conversation_id = cookie.read("conversationIdToken")
             url = `/consult/api/get_help?conversation_id_token=${conversation_id}`
           }
           this.onAjaxSuccess("GET", url, handleSessionInfo)
         }
 
         this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
-          if (!this.chatStarted) { return }
+          if (!this.socket) { return }
           let newMessage = document.createElement("div")
           newMessage.innerHTML = `<span class="message-sender">${from}</span> <span class="message-timestamp">${timestamp}</span> <span class="message-contents">${message}</span>`
           let isMe = this.trimmedEqual(userPublicIdentifier, chat.user_public_identifier)
@@ -181,25 +166,29 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.closeChat = function() {
-          this.channel.push("conversation_closed", {
-            ended_by: this.user_name,
-            user_id_token: this.user_id_token,
-          })
+          if (this.channel) {
+            this.channel.push("conversation_closed", {})
+          }
           if (this.userIsRep) {
             // Don't disconnect yet. Wait for notification, and in the
             // meantime, display the "conversation closed" message
             // that will bounce back
             this.disableChat()
           } else {
-            this.chatStarted = false
-            chat.socket.disconnect()
             this.resetChat()
           }
         }
 
+        this.closeConnection = function() {
+          if (this.socket) {
+            this.socket.disconnect()
+            this.socket = null
+            this.channel = null
+          }
+        }
+
         this.reactToChatClosing = function() {
-          chat.socket.disconnect()
-          this.chatStarted = false
+          this.closeConnection()
           this.disableChat()
         }
 
@@ -208,7 +197,8 @@ let Consult = exports.Consult = function Consult(socketModule) {
         }
 
         this.resetChat = function() {
-          cookie.erase("conversationId")
+          this.closeConnection()
+          cookie.erase("conversationIdToken")
           chatMessages.innerHTML = ""
           this.chatBox.className = "inactive"
         }

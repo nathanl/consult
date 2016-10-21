@@ -3,16 +3,19 @@ defmodule Consult.ConversationChannel do
   alias Consult.{Conversation,Message}
   require Ecto.Query
 
-  def join("conversation:" <> requested_id, %{"conversation_id_token" => conversation_id_token, "user_role_token" => user_role_token}, socket) do
+  def join("conversation:" <> requested_id, %{"conversation_id_token" => conversation_id_token, "user_id_token" => user_id_token, "user_role_token" => user_role_token, "user_name" => user_name}, socket) do
     authorized_id = Consult.Token.verify_conversation_id(conversation_id_token)
     [requested_id, authorized_id] = Enum.map([requested_id, authorized_id], &ensure_integer/1)
     
     if requested_id == authorized_id do
       authorized_role = Consult.Token.verify_user_role(user_role_token)
+      verified_user_id = Consult.Token.verify_user_id(user_id_token)
       send(self, {:after_join, authorized_id})
       socket = socket
       |> assign(:conversation_id, authorized_id)
       |> assign(:user_role, authorized_role)
+      |> assign(:user_name, user_name)
+      |> assign(:user_id, verified_user_id)
       {:ok, socket}
     else
       {:error, "Not authorized to join this conversation"}
@@ -34,27 +37,27 @@ defmodule Consult.ConversationChannel do
     {:noreply, socket}
   end
 
-  def handle_in("new_msg", %{"body" => body, "user_name" => user_name, "user_id_token" => user_id_token}, socket) do
+  def handle_in("new_msg", %{"body" => body}, socket) do
     %Conversation{ended_at: nil} = Consult.repo.get_by!(Conversation, id: socket.assigns[:conversation_id])
-    message = record_message(socket.assigns[:conversation_id], body, user_id_token, user_name, socket.assigns[:user_role])
+    message = record_message(socket.assigns[:conversation_id], body, socket.assigns[:user_id], socket.assigns[:user_name], socket.assigns[:user_role])
 
     broadcast!(socket, "new_msg", message_for_channel(message))
     Consult.PanelChannel.send_update
     {:noreply, socket}
   end
 
-  def handle_in("conversation_closed", %{"ended_by" => ended_by, "user_id_token" => user_id_token}, socket) do
+  def handle_in("conversation_closed", %{}, socket) do
     closed = close_conversation(socket.assigns[:conversation_id])
     body = [
       "(Conversation ended by",
-      ended_by,
+      socket.assigns[:user_name],
       "at",
       Ecto.DateTime.to_string(closed.ended_at),
       ")",
     ] |> Enum.join(" ")
 
     sender_name = "System"
-    message = record_message(socket.assigns[:conversation_id], body, user_id_token, sender_name, "system")
+    message = record_message(socket.assigns[:conversation_id], body, socket.assigns[:user_id], sender_name, "system")
 
     broadcast!(socket, "new_msg", message_for_channel(message))
     broadcast!(socket, "conversation_closed", %{})
@@ -62,9 +65,7 @@ defmodule Consult.ConversationChannel do
     {:noreply, socket}
   end
 
-  defp record_message(conversation_id, content, user_id_token, sender_name, sender_role) do
-    sender_id = Consult.Token.verify_user_id(user_id_token)
-
+  defp record_message(conversation_id, content, sender_id, sender_name, sender_role) do
     new_message =
       %Message{content: content, conversation_id: conversation_id, sender_name: sender_name, sender_id: sender_id, sender_role: sender_role}
       |> Message.changeset
