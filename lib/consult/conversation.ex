@@ -51,7 +51,8 @@ defmodule Consult.Conversation do
 
     # Join the first message for each conversation
     def id_and_message_info(query) do
-      from conv in query, left_join: messages in fragment(
+      query = with_last_message_time_from_role(query, "representative")
+      from [conv, last_representative_message] in query, left_join: messages in fragment(
       """
       (SELECT
       conversation_id, sender_name, content,
@@ -61,16 +62,6 @@ defmodule Consult.Conversation do
       """
       ),
       on: (messages.conversation_id == conv.id and messages.row == 1),
-      left_join: last_representative_message in fragment(
-      """
-      (
-        SELECT MAX(cm.inserted_at) AS last_rep_message_at, cm.conversation_id
-        FROM consult_messages AS cm
-        WHERE cm.sender_role = 'representative'
-        GROUP BY conversation_id
-      )
-      """
-      ), on: last_representative_message.conversation_id == conv.id,
       left_join: tags in assoc(conv, :tags),
       preload: [tags: tags],
       select: %{
@@ -97,11 +88,6 @@ defmodule Consult.Conversation do
       )
       """, ^role),
       on: last_message_from_role.conversation_id == conv.id
-    end
-
-    def select_stuff(query) do
-      from [conv, last_rep_message] in query,
-      select: {conv.id, last_rep_message.last_rep_message_at}
     end
 
   end
