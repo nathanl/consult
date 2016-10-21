@@ -52,7 +52,8 @@ defmodule Consult.Conversation do
     # Join the first message for each conversation
     def id_and_message_info(query) do
       query = with_last_message_time_from_role(query, "representative")
-      from [conv, last_representative_message] in query, left_join: messages in fragment(
+      from [conv, last_representative_message] in query,
+      left_join: messages in fragment(
       """
       (SELECT
       conversation_id, sender_name, content,

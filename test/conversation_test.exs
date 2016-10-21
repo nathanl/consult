@@ -13,14 +13,4 @@ defmodule Consult.ConversationTest do
     end
   end
 
-  test "how do these queries work" do
-    TestApp.Repo.insert!(Fixtures.ongoing_conversation)
-    results = Conversation
-    |> Conversation.Scopes.with_last_message_time_from_role("representative")
-    |> Conversation.Scopes.select_stuff
-    |> Consult.repo.all
-
-    IO.inspect results
-  end
-
 end
