@@ -54,6 +54,8 @@ To your Endpoint, add this:
 use Consult.Socket
 ```
 
+### Configuration
+
 In your Mix configuration (eg, `config.exs` or an environment-specific one), add lines like the following, referencing your own endpoint and ecto Repo modules:
 
 ```elixir
@@ -62,12 +64,26 @@ config :consult, :repo, MyApp.Repo
 config :consult, :hooks_module, MyApp.ConsultHooks
 ```
 
-The hooks module referenced in the configuration must define the following functions:
+### Hooks Module
 
-- `user_for_request(conn)` - must return a map or struct representing the user for the current request. `user.id` and `user.name` are required fields, but both can have `nil` values if (for instance) the user is not logged in.
-- `representative?(user)` accepts one of the user maps returned by `user_for_request(conn)` and returns a boolean, answering the question "is this person allowed to function as a customer service representative - for example, to answer user chat requests?"
+The hooks module referenced in the configuration must be defined in your application. It must define the following functions:
 
-Here's the simplest possible implementation:
+- `representative?(user)`
+- `user_for_request(conn)`
+
+#### - `representative?(user)
+
+This function  accepts one of the user maps returned by `user_for_request(conn)` and returns a boolean. If it's true, the user will be allowed to answer incoming chats.
+
+#### `user_for_request(conn)`
+
+This function must must return a map or struct representing the user for the current request. Typically, this will mean checking the session, but your logic may vary. `user.id` and `user.name` are required fields, but both can have `nil` values if (for instance) the user is not logged in.
+
+The user's id and name will be recorded in the database with any messages they send, and the name will be displayed in the chat box. If `user.name` is nil, a default value will be used. Since Consult can differentiate between someone starting a chat in the app vs one answering chats from the customer service dashboard, it gives them different default names accordingly ("User" and "Representative"). It also labels each message with the role "user" or "representative", regardless of the names used.
+
+#### Implementation
+
+Here's the simplest possible implementation of a hooks module:
 
 ```elixir
 defmodule MyApp.ConsultHooks do
@@ -81,7 +97,7 @@ defmodule MyApp.ConsultHooks do
   # 'user' is a return value from 'user_for_request'
   def representative?(_user) do
     # doesn't bother inspecting user, so all users
-    # can see and answer incoming user chats
+    # will be allowed to see and answer incoming user chats
     # in the customer support dashboard
     true
   end
