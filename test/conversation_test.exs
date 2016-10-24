@@ -30,6 +30,7 @@ defmodule Consult.ConversationTest do
       assert Regex.match?(~r/How quickly/, ended.first_user_message_content)
       assert ended.last_user_message_name == "Alex"
       assert Regex.match?(~r/probably fine/, ended.last_user_message_content || "")
+      assert ended.last_rep_message_name == "Casey"
     end
   end
 

@@ -81,7 +81,8 @@ defmodule Consult.Conversation do
     def new_id_and_message_info(query) do
       # query = with_last_message_time_from_role(query, "representative")
       query = with_messages_snapshot_from_role(query, "user")
-      from [conv, user_messages_snapshot] in query,
+      query = with_messages_snapshot_from_role(query, "representative")
+      from [conv, user_messages_snapshot, rep_messages_snapshot] in query,
       # left_join: tags in assoc(conv, :tags),
       # preload: [tags: tags],
       select: %{
@@ -93,6 +94,7 @@ defmodule Consult.Conversation do
         first_user_message_content: user_messages_snapshot.first_message_content,
         last_user_message_name: user_messages_snapshot.last_sender_name,
         last_user_message_content: user_messages_snapshot.last_message_content,
+        last_rep_message_name: rep_messages_snapshot.last_sender_name,
         # first_message: %{
         #   sender_name: messages.sender_name,
         #   content: messages.content

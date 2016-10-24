@@ -70,8 +70,8 @@ defmodule Fixtures do
           content: "How quickly can you ship a fire extinguisher?"
         },
         %Message{
-          sender_id: "rep@example.com",
-          sender_name: "Rep",
+          sender_id: "casey@example.com",
+          sender_name: "Casey",
           sender_role: "representative",
           content: "Could be there by Tuesday."
         },
