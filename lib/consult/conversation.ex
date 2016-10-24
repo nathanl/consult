@@ -83,21 +83,31 @@ defmodule Consult.Conversation do
       from conv in query,
       left_join: last_message_from_role in fragment(
       """
-      (
-        SELECT
+      SELECT
         conversation_id,
-        row_number()             OVER w AS row,
-        first_value(inserted_at) OVER w AS first_message_time,
-        last_value(inserted_at)  OVER w AS last_message_time,
-        first_value(content)     OVER w AS first_message_content,
-        last_value(content)      OVER w AS last_message_content
-        FROM consult_messages cm
-        WHERE cm.sender_role = ? 
-        WINDOW w AS (
-          PARTITION BY conversation_id
-          ORDER BY id ASC
-        )
-      )
+        row,
+        first_message_time,
+        last_message_time,
+        first_message_content,
+        last_message_content
+        FROM
+        (
+          SELECT
+          conversation_id,
+          row_number()             OVER w AS row,
+          first_value(inserted_at) OVER w AS first_message_time,
+          last_value(inserted_at)  OVER w AS last_message_time,
+          first_value(content)     OVER w AS first_message_content,
+          last_value(content)      OVER w AS last_message_content
+          FROM consult_messages cm
+          WHERE cm.sender_role = ?
+          WINDOW w AS (
+            PARTITION BY conversation_id
+            ORDER BY id ASC
+          )
+        ) message_snapshots
+      ORDER BY message_snapshots.row DESC
+      LIMIT 1
       """,
       ^role),
       on: last_message_from_role.conversation_id == conv.id
@@ -114,24 +124,6 @@ defmodule Consult.Conversation do
         last_content: messages_snapshot.last_message_content,
       }
     end
-# SELECT  
-#     cstamp,
-#     price,
-#     date_trunc('hour',cstamp) AS h,
-#     floor(EXTRACT(minute FROM cstamp) / 5) AS m5,
-#     min(price) OVER w,
-#     max(price) OVER w,
-#     first_value(price) OVER w,
-#     last_value(price) OVER w
-# FROM trades
-# Where date_trunc('hour',cstamp) = timestamp '2013-03-29 09:00:00'
-# WINDOW w AS (
-#     PARTITION BY date_trunc('hour',cstamp) , floor(extract(minute FROM cstamp) / 5)
-#     ORDER BY cstamp
-#     range between unbounded preceding and unbounded following
-#     )
-# ORDER BY cstamp;
-
 
     def with_last_message_time_from_role(query, role) do
       from conv in query,

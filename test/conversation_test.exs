@@ -18,10 +18,8 @@ defmodule Consult.ConversationTest do
     results = Conversation
     |> Conversation.Scopes.with_messages_snapshot_from_role("user")
     |> Conversation.Scopes.select_stuff
-    
     # results = Ecto.Adapters.SQL.to_sql(:all, Consult.repo, results)
     |> Consult.repo.all
-
     IO.inspect results
   end
 
