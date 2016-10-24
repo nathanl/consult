@@ -25,6 +25,16 @@ defmodule Consult.ConversationSummaryTest do
     assert Enum.count(ongoing    ) == 1
   end
 
+  @tag :skip
+  test "includes the first and last message from the user" do
+    TestApp.Repo.insert!(Fixtures.ended_conversation)
+    [_, _, {_, [ended|_]}] = Summary.conversations
+    assert ended.first_user_message_name == "Alex"
+    assert Regex.match?(~r/How quickly/, ended.first_user_message_content)
+    assert ended.last_user_message_name == "Alex"
+    assert Regex.match?(~r/probably fine/, ended.last_user_message_content)
+  end
+
   test "gets conversations with all their tags" do
     TestApp.Repo.insert!(Fixtures.conversation_with_tags(["bug", "bad"]))
     [{_, [new_unanswered | _]}, _, _] = Summary.conversations

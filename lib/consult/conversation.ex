@@ -76,16 +76,41 @@ defmodule Consult.Conversation do
         }
       }
     end
+    
+
+    def new_id_and_message_info(query) do
+      # query = with_last_message_time_from_role(query, "representative")
+      query = with_messages_snapshot_from_role(query, "user")
+      from [conv, user_messages_snapshot] in query,
+      # left_join: tags in assoc(conv, :tags),
+      # preload: [tags: tags],
+      select: %{
+        conv: conv,
+        id: conv.id,
+        # last_representative_message: last_representative_message.last_rep_message_at,
+        # tags: [tags],
+        first_user_message_name: user_messages_snapshot.first_sender_name,
+        first_user_message_content: user_messages_snapshot.first_message_content,
+        last_user_message_name: user_messages_snapshot.last_sender_name,
+        last_user_message_content: user_messages_snapshot.last_message_content,
+        # first_message: %{
+        #   sender_name: messages.sender_name,
+        #   content: messages.content
+        # }
+      }
+    end
 
     # grab info about the first and last message in this conversation,
     # from a user with this role
     def with_messages_snapshot_from_role(query, role) do
       from conv in query,
-      left_join: last_message_from_role in fragment(
+      left_join: message_snapshot in fragment(
       """
       SELECT
         conversation_id,
         row,
+        first_sender_name,
+        last_sender_name,
         first_message_time,
         last_message_time,
         first_message_content,
@@ -95,6 +120,8 @@ defmodule Consult.Conversation do
           SELECT
           conversation_id,
           row_number()             OVER w AS row,
+          first_value(sender_name) OVER w as first_sender_name,
+          last_value(sender_name)  OVER w as last_sender_name,
           first_value(inserted_at) OVER w AS first_message_time,
           last_value(inserted_at)  OVER w AS last_message_time,
           first_value(content)     OVER w AS first_message_content,
@@ -110,7 +137,7 @@ defmodule Consult.Conversation do
       LIMIT 1
       """,
       ^role),
-      on: last_message_from_role.conversation_id == conv.id
+      on: message_snapshot.conversation_id == conv.id
     end
 
     def select_stuff(query) do
