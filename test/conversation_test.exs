@@ -13,4 +13,15 @@ defmodule Consult.ConversationTest do
     end
   end
 
+  describe "if_unowned_mark_owned_by" do
+
+    test "if the conversation is unowned, it marks it owned by the given user id" do
+      inserted_id = TestApp.Repo.insert!(%Conversation{}).id
+      Conversation.if_unowned_mark_owned_by(inserted_id, "Nathan")
+      fetched = (Ecto.Query.from c in Conversation, where: c.id == ^inserted_id)
+      |> Consult.repo.one
+      assert fetched.owned_by_id == "Nathan"
+    end
+  end
+
 end

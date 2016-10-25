@@ -8,11 +8,12 @@ defmodule Consult.Conversation do
     has_many :conversation_tags, Consult.ConversationTag
     many_to_many :tags, Consult.Tag, join_through: Consult.ConversationTag
     field :ended_at, Ecto.DateTime
+    field :owned_by_id, :string
 
     timestamps
   end
 
-  @allowed_params ~w(ended_at)
+  @allowed_params ~w(ended_at owned_by_id)
   
   def changeset(conversation, params \\ %{}) do
     conversation |>
@@ -25,6 +26,13 @@ defmodule Consult.Conversation do
 
   def ended?(conversation) do
     not is_nil(conversation.ended_at)
+  end
+
+  def if_unowned_mark_owned_by(convo_id, user_id) do
+    conversation = Consult.repo.get_by(Consult.Conversation, id: convo_id)
+    if conversation do
+      changeset(conversation, %{owned_by_id: user_id}) |> Consult.repo.update
+    end
   end
 
   defmodule Scopes do

@@ -10,6 +10,9 @@ defmodule Consult.ConversationChannel do
     if requested_id == authorized_id do
       authorized_role = Consult.Token.verify_user_role(user_role_token)
       verified_user_id = Consult.Token.verify_user_id(user_id_token)
+      if authorized_role == "representative" do
+        Conversation.if_unowned_mark_owned_by(authorized_id, verified_user_id)
+      end
       send(self, {:after_join, authorized_id})
       socket = socket
       |> assign(:conversation_id, authorized_id)

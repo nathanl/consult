@@ -32,19 +32,21 @@ defmodule Consult.ChatSessionController do
   defp chat_session_info(conn, user_role, conversation_id) do
     user = Consult.hooks_module.user_for_request(conn)
     user_name = user.name || default_user_name(user_role)
+    user_id = user.id || default_user_id
     %{
-      user_id_token: Consult.Token.sign_user_id(user.id),
+      user_id_token: Consult.Token.sign_user_id(user_id),
       user_role_token: Consult.Token.sign_user_role(user_role),
       user_name: user_name,
       channel_name: "conversation:#{conversation_id}",
       conversation_id_token: Consult.Token.sign_conversation_id(conversation_id),
       user_public_identifier: Consult.Token.user_identifier(
-        %{id: user.id, name: user_name}
+        %{id: user_id, name: user_name}
       ),
     }
   end
 
-  def default_user_name(_role = "user"), do: "User"
-  def default_user_name(_role = "representative"), do: "Representative"
+  defp default_user_name(_role = "user"), do: "User"
+  defp default_user_name(_role = "representative"), do: "Representative"
+  defp default_user_id, do: "anonymous_id"
 
 end

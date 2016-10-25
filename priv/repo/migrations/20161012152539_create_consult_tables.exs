@@ -4,6 +4,7 @@ defmodule TestApp.Repo.Migrations.CreateConsultTables do
   def change do
     create table(:consult_conversations) do
       add :ended_at, :datetime
+      add :owned_by_id, :string
       timestamps
     end
 
