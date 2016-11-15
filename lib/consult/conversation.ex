@@ -30,8 +30,11 @@ defmodule Consult.Conversation do
 
   def if_unowned_mark_owned_by(convo_id, user_id) do
     conversation = Consult.repo.get_by(Consult.Conversation, id: convo_id)
-    if conversation do
-      changeset(conversation, %{owned_by_id: user_id}) |> Consult.repo.update
+    if conversation && is_nil(conversation.owned_by_id) do
+      changeset(
+      conversation,
+      %{owned_by_id: Consult.Conversions.string_id(user_id)}
+      ) |> Consult.repo.update!
     end
   end
 
