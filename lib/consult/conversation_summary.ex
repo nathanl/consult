@@ -4,19 +4,24 @@ defmodule Consult.ConversationSummary do
   require Ecto.Query
   @closed_conversation_count 10 # TODO make configurable
 
-  def html do
+  def html(user_id) do
     {:safe, html_iodata} = Phoenix.View.render(
-      Consult.ConversationView, "index.html", conversations: conversations
+      Consult.ConversationView, "index.html", conversations: conversations(user_id)
     )
     :erlang.iolist_to_binary(html_iodata)
   end
 
-  def conversations do
+  def conversations(user_id) do
     query = Conversation |> Scopes.id_and_message_info
+    ongoing = ongoing_conversations(query)
+    {mine, others} = Enum.partition(ongoing, fn (conv) ->
+      conv.owned_by_id == user_id
+    end)
 
     [
       {"Unanswered", unanswered_conversations(query)},
-      {"Ongoing", ongoing_conversations(query)},
+      {"Owned by Me", mine},
+      {"Owned by Other Reps", others},
       {"Ended", ended_conversations(query)},
     ]
   end

@@ -2,7 +2,15 @@ defmodule Consult.ChatSessionController do
   use Phoenix.Controller
   alias Consult.Conversation
 
-  plug Consult.RepresentativesOnly when action in [:give_help]
+  plug Consult.RepresentativesOnly when action in [:give_help, :watch_dashboard]
+
+  def watch_dashboard(conn, %{}) do
+    user = Consult.hooks_module.user_for_request(conn)
+    send_json_response(conn, %{
+      user_id_token: Consult.Token.sign_user_id(user.id),
+      user_name: user.name,
+    })
+  end
 
   def give_help(conn, %{"conversation_id" => conversation_id}) do
     conversation = Consult.repo.get_by(Conversation, id: conversation_id)

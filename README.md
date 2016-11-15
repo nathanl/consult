@@ -62,7 +62,10 @@ In your Mix configuration (eg, `config.exs` or an environment-specific one), add
 config :consult, :endpoint, MyApp.Endpoint
 config :consult, :repo, MyApp.Repo
 config :consult, :hooks_module, MyApp.ConsultHooks
+config :consult, :presence_module, MyApp.Presence
 ```
+
+Details below.
 
 ### Hooks Module
 
@@ -81,7 +84,7 @@ This function must must return a map or struct representing the user for the cur
 
 The user's id and name will be recorded in the database with any messages they send, and the name will be displayed in the chat box. If `user.name` is nil, a default value will be used. Since Consult can differentiate between someone starting a chat in the app vs one answering chats from the customer service dashboard, it gives them different default names accordingly ("User" and "Representative"). It also labels each message with the role "user" or "representative", regardless of the names used.
 
-#### Implementation
+#### Hooks Module Implementation
 
 Here's the simplest possible implementation of a hooks module:
 
@@ -104,6 +107,12 @@ defmodule MyApp.ConsultHooks do
 
 end
 ```
+
+#### Presence Module
+
+Consult uses `Phoenix.Presence` to track which customer service representatives are watching the customer service dashboard. This allows Consult to push updates to each rep, customized for them - listing conversations they're handling separately from conversations other reps are handling.
+
+You must have a presence module in your app and add it to your app's supervision tree, as shown [in the Presence docs](https://hexdocs.pm/phoenix/Phoenix.Presence.html). Then tell Consult about your presence module by declaring it in your configuration, as shown above.
 
 ### Templates
 

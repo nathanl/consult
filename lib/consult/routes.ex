@@ -23,6 +23,7 @@ defmodule Consult.Routes do
 
     scope "/api" do
       pipe_through :consult_api
+      get  "/watch_dashboard",                 ChatSessionController, :watch_dashboard
       get  "/get_help",                        ChatSessionController, :get_help
       get  "/give_help/:conversation_id",      ChatSessionController, :give_help
       put  "/close_conversation/:conversation_id_token", ChatSessionController, :close_conversation

@@ -13,7 +13,7 @@ defmodule Consult.Conversation do
     timestamps
   end
 
-  @allowed_params ~w(ended_at owned_by_id)
+  @allowed_params [:ended_at, :owned_by_id]
   
   def changeset(conversation, params \\ %{}) do
     conversation |>
@@ -33,7 +33,7 @@ defmodule Consult.Conversation do
     if conversation && is_nil(conversation.owned_by_id) do
       changeset(
       conversation,
-      %{owned_by_id: Consult.Conversions.string_id(user_id)}
+      %{owned_by_id: user_id}
       ) |> Consult.repo.update!
     end
   end
@@ -72,22 +72,12 @@ defmodule Consult.Conversation do
       """
       ),
       on: (messages.conversation_id == conv.id and messages.row == 1),
-      left_join: last_representative_message in fragment(
-      """
-      (
-        SELECT MAX(cm.inserted_at) AS last_rep_message_at, cm.conversation_id
-        FROM consult_messages AS cm
-        WHERE cm.sender_role = 'representative'
-        GROUP BY conversation_id
-      )
-      """
-      ), on: last_representative_message.conversation_id == conv.id,
       left_join: tags in assoc(conv, :tags),
       preload: [tags: tags],
       select: %{
         conv: conv,
         id: conv.id,
-        last_representative_message: last_representative_message.last_rep_message_at,
+        owned_by_id: conv.owned_by_id,
         tags: [tags],
         first_message: %{
           sender_name: messages.sender_name,
@@ -103,13 +93,13 @@ defmodule Consult.Conversation do
   # TODO find way to make these part of query
     def unanswered(conversations) do
       conversations |> Enum.filter(fn (conversation) ->
-        is_nil(conversation.last_representative_message)
+        is_nil(conversation.owned_by_id)
       end)
     end
 
     def ongoing(conversations) do
       conversations |> Enum.filter(fn (conversation) ->
-        !is_nil(conversation.last_representative_message)
+        !is_nil(conversation.owned_by_id)
       end)
     end
   end

@@ -21,8 +21,9 @@ defmodule Fixtures do
     }
   end
 
-  def ongoing_conversation(options \\ %{rep_id: "1"}) do
+  def conversation_owned_by(%{rep_id: rep_id}) do
     %Conversation {
+      owned_by_id: rep_id,
       messages: [
         %Message{
           sender_id: nil,
@@ -31,7 +32,7 @@ defmodule Fixtures do
           content: "Is your maple syrup vegan?"
         },
         %Message{
-          sender_id: options.rep_id,
+          sender_id: rep_id,
           sender_role: "representative",
           sender_name: "Rep",
           content: "Yes, and made from free-range trees!"

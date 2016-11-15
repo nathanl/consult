@@ -14,5 +14,6 @@ config :consult, TestApp.Repo,
 config :consult, TestApp.Endpoint, secret_key_base: "abc123"
 config :consult, :endpoint, TestApp.Endpoint
 config :consult, :repo, TestApp.Repo
+config :consult, :presence_module, TestApp.Presence
 
 config :logger, level: :warn

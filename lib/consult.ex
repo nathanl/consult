@@ -13,11 +13,13 @@ defmodule Consult do
     [
       supervisor(TestApp.Endpoint, []),
       supervisor(TestApp.Repo, []),
+      supervisor(TestApp.Presence, []),
     ]
   end
 
   def children_for_environment(_) do
-    []
+    [
+    ]
   end
 
   defmodule ConfigError do
@@ -43,6 +45,13 @@ defmodule Consult do
       :consult,
       :hooks_module
     ) || config_error(:hooks_module)
+  end
+
+  def presence_module do
+    Application.get_env(
+      :consult,
+      :presence_module
+    ) || config_error(:presence_module)
   end
 
   defp config_error(name) do

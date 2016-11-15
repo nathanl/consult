@@ -28,6 +28,28 @@ let Consult = exports.Consult = function Consult(socketModule) {
     erase: function(name) { this.write(name,"",-1); }
   }
 
+  let onAjaxSuccess = function(verb, url, callback) {
+    let httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      console.log('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = function() {
+      if (httpRequest.readyState === XMLHttpRequest.DONE) {
+        if (httpRequest.status === 200) {
+          callback(
+            JSON.parse(httpRequest.responseText)
+          )
+        } else {
+          console.log('There was a problem with the request.');
+        }
+      }
+    }
+    httpRequest.open(verb, url);
+    httpRequest.send();
+  }
+
   this.enable = function() {
     if (document.getElementById("consult-chatbox") !== null) {
       let Chat = function Chat() {
@@ -97,7 +119,7 @@ let Consult = exports.Consult = function Consult(socketModule) {
             let conversation_id = cookie.read("conversationIdToken")
             url = `/consult/api/get_help?conversation_id_token=${conversation_id}`
           }
-          this.onAjaxSuccess("GET", url, handleSessionInfo)
+          onAjaxSuccess("GET", url, handleSessionInfo)
         }
 
         this.addMessage = function(timestamp, from, message, userPublicIdentifier) {
@@ -109,28 +131,6 @@ let Consult = exports.Consult = function Consult(socketModule) {
           newMessage.className = this.compactedString(["message", personTag])
           chatMessages.appendChild(newMessage)
           chatMessages.scrollTop = chatMessages.scrollHeight // scroll to bottom
-        }
-
-        this.onAjaxSuccess = function(verb, url, callback) {
-          let httpRequest = new XMLHttpRequest();
-
-          if (!httpRequest) {
-            console.log('Giving up :( Cannot create an XMLHTTP instance');
-            return false;
-          }
-          httpRequest.onreadystatechange = function() {
-            if (httpRequest.readyState === XMLHttpRequest.DONE) {
-              if (httpRequest.status === 200) {
-                callback(
-                  JSON.parse(httpRequest.responseText)
-                )
-              } else {
-                console.log('There was a problem with the request.');
-              }
-            }
-          }
-          httpRequest.open(verb, url);
-          httpRequest.send();
         }
 
         this.displayError = function(message) {
@@ -245,17 +245,23 @@ let Consult = exports.Consult = function Consult(socketModule) {
     if (document.getElementById("consult-dashboard") !== null) {
       let main = document.getElementById("main")
 
-      let socket = new socketModule("/consult_socket", {})
-      socket.connect()
-      let channel = socket.channel("cs_panel", {})
+      onAjaxSuccess("GET", "/consult/api/watch_dashboard", function(resp){
+        let socket = new socketModule("/consult_socket", {})
+        socket.connect()
+        let channel = socket.channel(
+          `cs_panel:${resp.user_id_token}`,
+          {name: resp.user_name}
+        )
 
-      channel.on("update", payload => {
-        main.innerHTML = payload.main_contents
+        channel.on("update", payload => {
+          main.innerHTML = payload.main_contents
+        })
+
+        channel.join()
+        .receive("ok", resp => console.log("Joined successfully", resp))
+        .receive("error", resp => console.log("Unable to join", resp))
       })
 
-      channel.join()
-      .receive("ok", resp => console.log("Joined successfully", resp))
-      .receive("error", resp => console.log("Unable to join", resp))
     }
 
   }

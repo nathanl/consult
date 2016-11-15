@@ -7,7 +7,8 @@ defmodule Consult.ConversationController do
   plug Consult.RepresentativesOnly
 
   def index(conn, _assigns) do
-    conversations = Consult.ConversationSummary.conversations
+    user = Consult.hooks_module.user_for_request(conn)
+    conversations = Consult.ConversationSummary.conversations(user.id)
     render conn, conversations: conversations, layout: {Consult.ConversationView, "layout.html"}
   end
 
