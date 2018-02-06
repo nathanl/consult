@@ -19,6 +19,8 @@
 - Given that we're setting a cookie on every request, if a user loads a page and we already know that they're in a chat session, they should have all the info they need to connect to the socket without having to do another setup request.
 - Start using Presence so we can know when reps are available to chat.
 - Instead of using `hooks_module.user_for_request` directly, have a function that calls it and checks that the user id and name match the types expected by the schema, and raises if not
+- Rethink names around "answered", "unanswered", "owned", "handled", etc. "owned_by_id" may change
+- Allow showing chat widget only when presence says there are people available"
 
 ## Ideas for Later
 - Support file uploads?
