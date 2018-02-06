@@ -12,7 +12,7 @@ defmodule Consult.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       compilers: [:phoenix] ++ Mix.compilers,
-      deps: deps,
+      deps: deps(),
 
       # For ExDoc
       name: "Consult",
@@ -67,13 +67,13 @@ defmodule Consult.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:phoenix, "~> 1.2"},
-      {:phoenix_html, "~> 2.6"},
+      {:phoenix, "~> 1.3"},
+      {:phoenix_html, "~> 2.10"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.0"},
+      {:phoenix_ecto, "~> 3.3"},
       {:postgrex, ">= 0.0.0"},
-      {:ex_doc, "~> 0.10", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev},
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:earmark, "~> 1.2", only: :dev},
     ]
   end
 

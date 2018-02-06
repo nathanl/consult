@@ -18,7 +18,8 @@ defmodule Consult.Token do
 
   def verify_user_id(user_id_token) do
     {:ok, user_id} =  Phoenix.Token.verify(
-      Consult.endpoint, "user_id", user_id_token
+      Consult.endpoint, "user_id", user_id_token,
+      max_age: max_token_age()
     )
     user_id
   end
@@ -33,7 +34,8 @@ defmodule Consult.Token do
 
   def verify_conversation_id(conversation_id_token) do
     case Phoenix.Token.verify(
-      Consult.endpoint, "conversation_id", conversation_id_token
+      Consult.endpoint, "conversation_id", conversation_id_token,
+      max_age: max_token_age()
     ) do
       {:ok, conversation_id} -> conversation_id
       _ -> raise InvalidConversationToken, message: conversation_id_token
@@ -46,7 +48,8 @@ defmodule Consult.Token do
 
   def verify_user_role(user_role_token) do
     case Phoenix.Token.verify(
-      Consult.endpoint, "user_role", user_role_token
+      Consult.endpoint, "user_role", user_role_token,
+      max_age: max_token_age()
     ) do
       {:ok, role_name} -> role_name
       _ -> raise InvalidUserRoleToken, message: user_role_token
@@ -69,6 +72,10 @@ defmodule Consult.Token do
     salt = "ilikebadgersohyes" # TODO make this the application's secret salt
     pre_hash = [salt, id, name] |> :erlang.list_to_binary()
     :crypto.hash(:sha256, pre_hash) |> Base.encode16
+  end
+
+  defp max_token_age() do
+    60 * 60 * 24 * 7 # TODO make configurable
   end
 
 end
