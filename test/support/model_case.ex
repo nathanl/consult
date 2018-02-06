@@ -1,5 +1,6 @@
 defmodule Consult.ModelCase do
   alias TestApp.Repo
+
   @moduledoc """
   This module defines the test case to be used by
   model tests.

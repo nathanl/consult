@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Consult.ShowExpectedStructure do
   # @moduledoc "Copy Consult migrations to consuming app, and stuff"
   @shortdoc "Show the expected table structure for Consult data"
   def run(_args) do
-    IO.puts """
+    IO.puts("""
     Consult needs a table structure like the following. Either create a
     migration like this, or adjust your schema to match.
 
@@ -18,10 +18,11 @@ defmodule Mix.Tasks.Consult.ShowExpectedStructure do
     already, you may want more or different indexes (eg, to support full-text
     search of message contents).
     -----
-    """
+    """)
+
     this_dir = Path.dirname(__ENV__.file)
     path = "#{this_dir}/../../../priv/repo/migrations/20161012152539_create_consult_tables.exs"
     contents = File.read!(path)
-    IO.puts contents
+    IO.puts(contents)
   end
 end

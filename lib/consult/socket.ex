@@ -3,17 +3,17 @@ defmodule Consult.Socket do
 
   defmacro __using__([]) do
     quote do
-      socket "/consult_socket", Consult.Socket
+      socket("/consult_socket", Consult.Socket)
     end
   end
 
   ## Channels
-  channel "conversation:*", Consult.ConversationChannel
-  channel "cs_panel:*", Consult.PanelChannel
+  channel("conversation:*", Consult.ConversationChannel)
+  channel("cs_panel:*", Consult.PanelChannel)
 
   ## Transports
   ## TODO make configurable?
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport(:websocket, Phoenix.Transports.WebSocket)
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can

@@ -8,10 +8,10 @@ defmodule Consult.Mixfile do
       app: :consult,
       version: @version,
       elixir: "~> 1.3",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
-      compilers: [:phoenix] ++ Mix.compilers,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      compilers: [:phoenix] ++ Mix.compilers(),
       deps: deps(),
 
       # For ExDoc
@@ -21,14 +21,14 @@ defmodule Consult.Mixfile do
         main: "readme",
         source_ref: "v#{@version}",
         source_url: "https://github.com/nathanl/consult",
-        homepage_url: "https://github.com/nathanl/consult",
-      ],
+        homepage_url: "https://github.com/nathanl/consult"
+      ]
     ]
   end
 
   def package do
     [
-      files:       ["lib", "priv", "web", "mix.exs", "README.md"],
+      files: ["lib", "priv", "web", "mix.exs", "README.md"],
       maintainers: ["Nathan Long <him@nathanmlong.com>"],
       licenses: ["MIT"],
       links: %{"Github" => "https://github.com/nathanl/swappy"}
@@ -47,8 +47,8 @@ defmodule Consult.Mixfile do
         :phoenix_pubsub,
         :phoenix_html,
         :phoenix_ecto,
-        :postgrex,
-      ],
+        :postgrex
+      ]
     ]
   end
 
@@ -73,7 +73,7 @@ defmodule Consult.Mixfile do
       {:phoenix_ecto, "~> 3.3"},
       {:postgrex, ">= 0.0.0"},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:earmark, "~> 1.2", only: :dev},
+      {:earmark, "~> 1.2", only: :dev}
     ]
   end
 

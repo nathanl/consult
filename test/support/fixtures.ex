@@ -1,28 +1,29 @@
 defmodule Fixtures do
-  alias Consult.{Conversation,Message,Tag}
+  alias Consult.{Conversation, Message, Tag}
 
   def new_conversation do
     %Conversation{}
   end
 
   def conversation_with_tags(tag_names) do
-    %Conversation {
-      tags: Enum.map(tag_names, fn (tag_name) ->
-        %Tag{name: tag_name}
-      end),
+    %Conversation{
+      tags:
+        Enum.map(tag_names, fn tag_name ->
+          %Tag{name: tag_name}
+        end),
       messages: [
         %Message{
           sender_id: nil,
           sender_name: "User",
           sender_role: "user",
-          content: "How much you want for that hamburger menu?",
-        },
+          content: "How much you want for that hamburger menu?"
+        }
       ]
     }
   end
 
   def conversation_owned_by(%{rep_id: rep_id}) do
-    %Conversation {
+    %Conversation{
       owned_by_id: rep_id,
       messages: [
         %Message{
@@ -36,13 +37,13 @@ defmodule Fixtures do
           sender_role: "representative",
           sender_name: "Rep",
           content: "Yes, and made from free-range trees!"
-        },
+        }
       ]
     }
   end
 
   def unanswered_conversation do
-    %Conversation {
+    %Conversation{
       messages: [
         %Message{
           sender_id: nil,
@@ -55,14 +56,14 @@ defmodule Fixtures do
           sender_name: "Cleese",
           sender_role: "user",
           content: "He is an halibut."
-        },
+        }
       ]
     }
   end
 
   def ended_conversation do
-    %Conversation {
-      ended_at: Ecto.DateTime.utc,
+    %Conversation{
+      ended_at: Ecto.DateTime.utc(),
       messages: [
         %Message{
           sender_id: nil,
@@ -81,9 +82,8 @@ defmodule Fixtures do
           sender_name: "Alex",
           sender_role: "user",
           content: "OK. That's [cough] probably fine, thanks!"
-        },
+        }
       ]
     }
   end
-
 end

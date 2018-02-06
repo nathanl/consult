@@ -4,7 +4,7 @@ defmodule Consult do
 
   def start(_type, _args) do
     # TODO is this an OK way to adjust per environment?
-    children = children_for_environment(Mix.env)
+    children = children_for_environment(Mix.env())
     opts = [strategy: :one_for_one, name: Consult.Supervisor]
     Supervisor.start_link(children, opts)
   end
@@ -13,13 +13,12 @@ defmodule Consult do
     [
       supervisor(TestApp.Endpoint, []),
       supervisor(TestApp.Repo, []),
-      supervisor(TestApp.Presence, []),
+      supervisor(TestApp.Presence, [])
     ]
   end
 
   def children_for_environment(_) do
-    [
-    ]
+    []
   end
 
   defmodule ConfigError do
@@ -57,5 +56,4 @@ defmodule Consult do
   defp config_error(name) do
     raise ConfigError, message: "missing config value '#{name}' for :consult"
   end
-
 end

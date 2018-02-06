@@ -7,7 +7,7 @@ defmodule Consult.ConversationSource do
 
   def id_for(convo_id_token) do
     with convo_id <- Consult.Token.verify_conversation_id(convo_id_token),
-    %Conversation{} <- Consult.repo.get_by(Conversation, id: convo_id) do
+         %Conversation{} <- Consult.repo().get_by(Conversation, id: convo_id) do
       convo_id
     else
       _ ->
@@ -17,8 +17,7 @@ defmodule Consult.ConversationSource do
 
   defp new_conversation_id do
     new_conversation = Conversation.changeset(%Conversation{})
-    {:ok, new_conversation} = Consult.repo.insert(new_conversation)
+    {:ok, new_conversation} = Consult.repo().insert(new_conversation)
     new_conversation.id
   end
-
 end

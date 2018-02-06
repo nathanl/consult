@@ -27,7 +27,7 @@ defmodule Consult.TokenTest do
   end
 
   test "signs and verifies string conversation id that contains an integer" do
-    conversation_id = :rand.uniform(10_000) |> Integer.to_string
+    conversation_id = :rand.uniform(10_000) |> Integer.to_string()
     token = Consult.Token.sign_conversation_id(conversation_id)
     assert conversation_id == Consult.Token.verify_conversation_id(token)
   end
@@ -62,7 +62,7 @@ defmodule Consult.TokenTest do
     u2 = %{id: 1, name: "User"}
     r1 = %{id: nil, name: "Rep"}
     r2 = %{id: 2, name: "Rep"}
-    identifiers = [u1,u2,r1,r2] |> Enum.map(&Consult.Token.user_identifier/1)
+    identifiers = [u1, u2, r1, r2] |> Enum.map(&Consult.Token.user_identifier/1)
     assert Enum.uniq(identifiers) == identifiers
   end
 
