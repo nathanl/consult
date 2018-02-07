@@ -24,7 +24,7 @@ defmodule Consult.ConversationChannel do
         Conversation.if_unowned_mark_owned_by(authorized_id, verified_user_id)
       end
 
-      send(self, {:after_join, authorized_id})
+      send(self(), {:after_join, authorized_id})
 
       socket =
         socket
@@ -143,7 +143,7 @@ defmodule Consult.ConversationChannel do
 
   defp message_for_channel(message) do
     %{
-      timestamp: Ecto.DateTime.to_string(message.inserted_at),
+      timestamp: NaiveDateTime.to_iso8601(message.inserted_at),
       from: message.sender_name,
       # We don't use the user_id or user_id_token for security reasons;
       # we don't want the receiver to be able to impersonate the sender
